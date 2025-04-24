@@ -1,5 +1,7 @@
 .venv
 .idea
 __pycache__/
-
+debug/
 *.zip
+*.db
+data/
