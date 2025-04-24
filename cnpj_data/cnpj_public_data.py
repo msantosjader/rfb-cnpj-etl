@@ -175,6 +175,3 @@ class CNPJDataScraper:
         # ordena os arquivos por nome
         result_sorted = dict(sorted(result.items(), key=lambda item: item[1]["filename"]))
         return result_sorted
-
-if __name__ == "__main__":
-    data = CNPJDataScraper()

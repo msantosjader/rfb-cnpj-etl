@@ -185,7 +185,6 @@ indexes = [
 
 # chaves primárias não criadas para não sacrificar performance:
 # "primary": {
-
 #     "empresa": ["cnpj_basico"],
 #     "estabelecimento": ["cnpj_basico", "cnpj_ordem", "cnpj_dv"],
 #     "simples": ["cnpj_basico"]

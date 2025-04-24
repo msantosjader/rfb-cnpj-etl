@@ -1,7 +1,7 @@
 # orchestrator.py
 
 """
-Orquestração do projeto.
+Orquestração da carga de dados
 """
 
 import os
@@ -122,9 +122,3 @@ def run_orchestrator(
         builder.enable_foreign_keys()
 
     print_log(f"EXECUÇÃO FINALIZADA | {engine.upper()} | {month_year}", level="done")
-
-
-
-if __name__ == "__main__":
-    run_orchestrator()
-
