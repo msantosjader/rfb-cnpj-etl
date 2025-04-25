@@ -141,14 +141,14 @@ Edite conforme a sua necessidade.
 
 ## Benchmark de execução
 
-| Processo                      | PostgreSQL   | SQLite       |
-|------------------------------|--------------|--------------|
-| Download dos arquivos        | 01:00:00     | 01:00:00     |
-| Preparação do banco de dados | 00:10:00     | 00:10:00     |
-| Carga de dados completa      | 01:40:00     | 01:00:00     |
-| Pós-processamento            | 00:10:00     | 00:03:00     |
-| Criação dos índices          | 01:00:00     | 00:50:00     |
-| **Total**                    | **04:00:00** | **03:00:00** |
+| Processo                      | Tempo                   |
+|------------------------------|-------------------------|
+| Download dos arquivos        | 00:50:00 ~ 01:00:00     |
+| Preparação do banco de dados | 00:05:00                |
+| Carga de dados completa      | 01:30:00 ~ 02:00:00     |
+| Pós-processamento            | 00:05:00 ~ 00:10:00     |
+| Criação dos índices          | 00:30:00 ~ 00:45:00     |
+| **Total**                    | **03:00:00 ~ 04:00:00** |
 
 * Utilizando a base de dados de abril de 2025.
 > Equipamento: i5-1235U, 16GB RAM, HDD, Windows 11
