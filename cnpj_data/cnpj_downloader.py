@@ -290,9 +290,10 @@ class CNPJDownloadManager:
                     remaining = remaining_bar.total - remaining_bar.n   # arquivos restantes após update
 
                     # atualiza a descrição da barra de progresso principal
+                    remaining_msg = "ARQUIVOS RESTANTES" if remaining > 1 else "ARQUIVO RESTANTE"
                     desc = (f"🕑 {now} "
                             f"|⏱️ {elapsed} "
-                            f"|ℹ️ {remaining} ARQUIVOS RESTANTES. BAIXANDO")
+                            f"|ℹ️ {remaining} {remaining_msg}. BAIXANDO")
                     remaining_bar.set_description(f"{desc}")
 
                     remaining_bar.refresh() # força atualização visual da barra
