@@ -29,7 +29,6 @@ DEFAULT_LOW_MEMORY = False                  # habilita o uso de memória limitad
 FILES_WITH_INVALID_BYTES = [
     "Estabelecimentos0",
     "Estabelecimentos2",
-
 ]
 
 BATCH_SIZE = 200_000                                        # número de registros por batch ao inserir no banco
@@ -46,7 +45,7 @@ POSTGRES = {
     "host": "localhost",
     "port": 5432,
     "user": "postgres",
-    "password": "369258",
+    "password": "sua_senha_aqui",
     "database": "dados_cnpj"
 }
 
@@ -73,4 +72,4 @@ BROWSER_AGENTS = [              # lista de user‑agents rotativos para as requi
 # ---------------------------------------------------------------------------
 # True: 🕒 23:18:32 |⏱️ 0:06:37 |🐞  2.507.405 (  1.27%) | ESTABELECIMENTOS8.ZIP   | FILA: 22 / 22
 # False: utiliza uma barra de progresso com tqdm
-DEBUG_LOG = True
+DEBUG_LOG = False
