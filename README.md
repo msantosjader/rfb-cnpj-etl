@@ -1,6 +1,6 @@
 # rfb-cnpj-etl
 
-[![Status](https://img.shields.io/badge/status-pronto-brightgreen)](https://github.com/msantosjader/rfb-cnpj-etl)
+[![Status](https://img.shields.io/badge/status-testando-yellow)](https://github.com/msantosjader/rfb-cnpj-etl)
 [![Python](https://img.shields.io/badge/python-3.9+-green)](...)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../../rfb-cnpj-etl/LICENSE)
 
@@ -15,6 +15,8 @@ Fonte: [Dados Abertos CNPJ - Receita Federal](https://dados.gov.br/dados/conjunt
 
 Este projeto pretende facilitar o acesso, extração e estruturação dos dados públicos do CNPJ, disponibilizados mensalmente pela Receita Federal, permitindo que desenvolvedores, analistas e pesquisadores utilizem essas informações em bases relacionais para fins analíticos, acadêmicos ou de integração com outros sistemas.
 O total de linhas (somando todas as tabelas) já supera os 196 milhões.
+
+Atualmente, estão sendo realizados testes de performance em consultas mais complexas.
 
 > Para manter os dados sempre atualizados, o processo de download e carga de dados deve ser executado novamente a cada nova publicação mensal.
 
