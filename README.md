@@ -119,7 +119,7 @@ python cnpj.py db load
 
 ### Logs no terminal
 
-Os logs exibem detalhamdamente o progresso de cada etapa (download, validação dos arquivos, preparação do banco de dados, carga dos dados por arquivo, criação dos índices).
+Os logs exibem detalhadamente o progresso de cada etapa (download, validação dos arquivos, preparação do banco de dados, carga dos dados por arquivo, criação dos índices).
 
 Veja exemplos em [logs.md](info/logs.md).
 
