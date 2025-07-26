@@ -10,7 +10,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # DIRETÓRIOS
 # ---------------------------------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent  # diretório base do projeto
+BASE_DIR = Path(__file__).resolve().parents[2]  # diretório base do projeto
 DATA_DIR = BASE_DIR / "data"  # diretório para dados (downloads e banco de dados)
 DOWNLOAD_DIR = DATA_DIR / "downloads"  # diretório onde os arquivos ZIP baixados serão armazenados
 
