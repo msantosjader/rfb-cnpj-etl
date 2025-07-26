@@ -1,6 +1,6 @@
 # rfb-cnpj-etl
 
-[![Status](https://img.shields.io/badge/status-testando-yellow)](https://github.com/msantosjader/rfb-cnpj-etl)
+[![Status](https://img.shields.io/badge/status-ativo-brightgreen)](https://github.com/msantosjader/rfb-cnpj-etl)
 [![Python](https://img.shields.io/badge/python-3.9+-green)](...)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../../rfb-cnpj-etl/LICENSE)
 
