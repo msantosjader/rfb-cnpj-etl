@@ -12,6 +12,7 @@ from typing import Dict, Tuple, Optional
 
 from config import CNPJ_DATA_URL
 
+
 class CNPJDataScraper:
     """
     Classe para acessar os dados de CNPJ disponíveis no site da Receita Federal.
@@ -20,10 +21,10 @@ class CNPJDataScraper:
         cnpj_data_url: URL base para acesso aos dados.
         _session: sessão HTTP persistente.
     """
-    def __init__(self):
-        self.cnpj_data_url = CNPJ_DATA_URL # url base para acesso aos dados
-        self._session = requests.Session() # cria uma sessão HTTP persistente
 
+    def __init__(self):
+        self.cnpj_data_url = CNPJ_DATA_URL  # url base para acesso aos dados
+        self._session = requests.Session()  # cria uma sessão HTTP persistente
 
     @staticmethod
     def _is_valid_period(month_year: str) -> bool:
@@ -33,12 +34,11 @@ class CNPJDataScraper:
         :param month_year: string no formato MM/AAAA
         :return: bool
         """
-        match = re.match(r'^(\d{2})/(\d{4})$', month_year) # regex para validar o formato MM/AAAA
+        match = re.match(r'^(\d{2})/(\d{4})$', month_year)  # regex para validar o formato MM/AAAA
         if not match:
             return False
 
         return True
-
 
     @staticmethod
     def _parse_month(month_year: str) -> Tuple[int, int]:
@@ -55,15 +55,14 @@ class CNPJDataScraper:
         except ValueError:
             return 0, 0
 
-
     def _available_months(self) -> Dict[str, str]:
         """
         Obtém os meses disponíveis para download.
 
         :return: Dicionário com os meses disponíveis.
         """
-        resp = self._session.get(self.cnpj_data_url)            # faz uma requisição GET para a URL base
-        resp.raise_for_status()                                 # verifica se a requisição foi bem-sucedida
+        resp = self._session.get(self.cnpj_data_url)  # faz uma requisição GET para a URL base
+        resp.raise_for_status()  # verifica se a requisição foi bem-sucedida
         soup = BeautifulSoup(resp.text, 'html.parser')  # analisa o HTML da página
 
         # extrai os links para os meses disponíveis
@@ -92,7 +91,6 @@ class CNPJDataScraper:
 
         return sorted_month_years
 
-
     def get_availabes(self):
         """
         Obtém os meses disponíveis para download.
@@ -103,7 +101,6 @@ class CNPJDataScraper:
         availables = ", ".join(month_years.keys())
         return availables
 
-
     def get_latest(self):
         """
         Obtém o último mês disponível para download.
@@ -113,7 +110,6 @@ class CNPJDataScraper:
         month_years = self._available_months()
         latest = next(iter(month_years.keys()))
         return latest
-
 
     def get_metadata(self, month_year: Optional[str] = None) -> Dict[str, Dict[str, str]]:
         """
@@ -135,12 +131,11 @@ class CNPJDataScraper:
         if month_year not in month_years_map:
             raise ValueError(f"{month_year} NÃO ESTÁ DISPONÍVEL PARA DOWNLOAD")
 
+        folder = month_years_map[month_year]  # obtém o período no formato AAAA-MM
+        folder_url = f"{self.cnpj_data_url}{folder}/"  # cria a URL do mês (base + AAAA-MM)
 
-        folder = month_years_map[month_year]            # obtém o período no formato AAAA-MM
-        folder_url = f"{self.cnpj_data_url}{folder}/"   # cria a URL do mês (base + AAAA-MM)
-
-        resp = self._session.get(folder_url)    # faz uma requisição GET para a URL do mês
-        resp.raise_for_status()                 # verifica se a requisição foi bem-sucedida
+        resp = self._session.get(folder_url)  # faz uma requisição GET para a URL do mês
+        resp.raise_for_status()  # verifica se a requisição foi bem-sucedida
 
         # extrai as URLs dos arquivos de CNPJ disponíveis para o período
         soup = BeautifulSoup(resp.text, 'html.parser')
@@ -166,10 +161,10 @@ class CNPJDataScraper:
                 file_size = int(cl)
 
             result[key] = {
-                "month_year":   month_year, # período (AAAA-MM)
-                "filename":     filename,   # nome do arquivo
-                "file_url":     file_url,   # url do arquivo
-                "file_size":    file_size   # tamanho do arquito (bytes)
+                "month_year": month_year,  # período (AAAA-MM)
+                "filename": filename,  # nome do arquivo
+                "file_url": file_url,  # url do arquivo
+                "file_size": file_size  # tamanho do arquito (bytes)
             }
 
         # ordena os arquivos por nome

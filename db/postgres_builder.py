@@ -1,12 +1,11 @@
-# postgres_builder.py
+# db/postgres_builder.py
 
 """
 Módulo para construção do banco de dados PostgreSQL.
 """
 
-import re
 import psycopg2
-from db.schema import indexes, tables, keys
+from db.schema import SCHEMA
 from utils.db_patch import apply_static_fixes
 from utils.logger import print_log
 
@@ -14,25 +13,14 @@ from utils.logger import print_log
 class PostgresBuilder:
     """
     Classe para construção do banco de dados PostgreSQL.
-
-    :params:
-        config: configurações do banco de dados.
-        tables: dicionário de tabelas e colunas.
-        conn: conexão com o banco de dados.
     """
+
     def __init__(self, config):
-        self.config = config    # dados de conexão com o banco de dados
-        self.tables = tables    # dicionário de tabelas e colunas
+        self.config = config
         self.conn = None
 
-
     def _connect(self):
-        """
-        Abre a conexão com o Postgres.
-
-        :returns: conexão Postgres pronta para uso
-        :raises psycopg2.Error: em caso de falha na conexão
-        """
+        """Abre a conexão com o Postgres."""
         try:
             conn = psycopg2.connect(
                 host=self.config["host"],
@@ -41,200 +29,193 @@ class PostgresBuilder:
                 user=self.config["user"],
                 password=self.config["password"],
             )
-            conn.set_client_encoding('WIN1252')  # Agora cliente e servidor estão alinhados
-            conn.autocommit = True
+            conn.set_client_encoding('WIN1252')
             return conn
         except psycopg2.Error as e:
-            try:
-                print_log(f"ERRO AO CONECTAR NO BANCO: {e}", level="error")
-            except UnicodeDecodeError:
-                print_log("ERRO AO CONECTAR NO BANCO: [mensagem contém caracteres inválidos]", level="error")
+            print_log(f"ERRO AO CONECTAR NO BANCO: {e}", level="error")
             raise
 
-
     def _create_database(self):
-        """
-        Cria o banco de dados se ele não existir.
-        """
         try:
             temp_config = self.config.copy()
             temp_config["database"] = "postgres"
-
-            conn = psycopg2.connect(
-                host=temp_config["host"],
-                port=temp_config["port"],
-                database=temp_config["database"],
-                user=temp_config["user"],
-                password=temp_config["password"],
-                options='-c client_encoding=LATIN1'
-            )
+            conn = psycopg2.connect(**temp_config)
             conn.autocommit = True
             cur = conn.cursor()
-
             db_name = self.config['database']
             cur.execute("SELECT 1 FROM pg_database WHERE datname = %s;", (db_name,))
             exists = cur.fetchone()
-
             if not exists:
                 cur.execute(f"CREATE DATABASE {db_name} ENCODING 'WIN1252' TEMPLATE template0;")
                 print_log("BANCO CRIADO", level="success")
-
             conn.close()
         except psycopg2.Error as e:
             print_log(f"ERRO AO CRIAR BANCO: {e}", level="error")
             raise
 
-
-    def drop_database(self):
-        """
-        Exclui o banco de dados.
-        """
+    def drop_tables(self):
         try:
             conn = self._connect()
             conn.autocommit = True
             cur = conn.cursor()
-
-            cur.execute("""
-                SELECT tablename
-                FROM pg_tables
-                WHERE schemaname = 'public';
-            """)
-
-            fetched_tables  = cur.fetchall()
-
-            for (table_name,) in fetched_tables :
+            cur.execute("SELECT tablename FROM pg_tables WHERE schemaname = 'public';")
+            for (table_name,) in cur.fetchall():
                 cur.execute(f'DROP TABLE IF EXISTS "{table_name}" CASCADE;')
-
             conn.close()
+            print_log("TABELAS ANTERIORES REMOVIDAS", level="info")
         except psycopg2.Error as e:
             print_log(f"ERRO AO EXCLUIR TABELAS: {e}", level="error")
             raise
 
-
     def create_tables(self):
         """
-        Cria todas as tabelas definidas em "tables".
+        Cria todas as tabelas. As chaves primárias definidas inline nas colunas
+        (em tabelas menores) são criadas aqui. As PKs de tabelas maiores,
+        definidas separadamente no SCHEMA, são adiadas.
         """
         try:
             print_log("CRIANDO TABELAS...", level="task")
-
-            if self.conn is None:
-                self.conn = self._connect()
-
+            if self.conn is None: self.conn = self._connect()
+            self.conn.autocommit = True
             cur = self.conn.cursor()
 
-            for schema_name, table_info in self.tables.items():
-                table_name = table_info["nome_tabela"]
-                columns = table_info["colunas"]
-
-                # monta as colunas
-                columns_sql = [f"{col} {col_type}" for col, col_type in columns.items()]
-
-                # adiciona as chaves primárias
-                pk_columns = keys.get("primary", {}).get(table_name)
-                if pk_columns:
-                    pk_str = ", ".join(pk_columns)
-                    columns_sql.append(f"PRIMARY KEY ({pk_str})")
-
-                # cria as tabelas
+            for table_name, definition in SCHEMA.items():
+                columns_sql = [
+                    f'"{col_name}" {col_type}'
+                    for col_name, col_type in definition['columns']
+                ]
                 columns_str = ", ".join(columns_sql)
-                cur.execute(f'CREATE UNLOGGED TABLE IF NOT EXISTS "{table_name}" ({columns_str});')
+
+                cur.execute(f'CREATE UNLOGGED TABLE IF NOT EXISTS public."{table_name}" ({columns_str});')
 
             print_log("TABELAS CRIADAS", level="success")
-
         except psycopg2.Error as e:
             print_log(f"ERRO AO CRIAR TABELAS: {e}", level="error")
             raise
 
+    def _add_primary_keys(self):
+        """
+        Adiciona as chaves primárias APENAS para as tabelas que as definem
+        separadamente no SCHEMA (ex: 'empresa', 'estabelecimento').
+        """
+        print_log("ADICIONANDO CHAVES PRIMÁRIAS (TABELAS GRANDES)...", level="task")
+        if self.conn is None: self.conn = self._connect()
+        self.conn.autocommit = True
+        cur = self.conn.cursor()
+
+        for table_name, definition in SCHEMA.items():
+            pk_cols = []
+            if 'primary_key' in definition:
+                pk_cols = definition['primary_key']
+
+            if pk_cols:
+                pk_cols_str = ', '.join(f'"{col}"' for col in pk_cols)
+                sql_command = f'ALTER TABLE public."{table_name}" ADD PRIMARY KEY ({pk_cols_str});'
+
+                try:
+                    print_log(f"  -> Adicionando PK em '{table_name}'...", level="info")
+                    cur.execute(sql_command)
+                except psycopg2.Error as e:
+                    # 42P16 = multiple_primary_keys, 42P07 = relation_already_exists
+                    if e.pgcode in ('42P16', '42P07'):
+                        print_log(f"     ℹ PK em '{table_name}' já existe, pulando.", level="info")
+                    else:
+                        print_log(f"ERRO AO ADICIONAR PK em '{table_name}': {e}", level="error")
+                        raise
+
+        print_log("CHAVES PRIMÁRIAS (TABELAS GRANDES) ADICIONADAS", level="success")
 
     def patch_data(self):
         """
-        Normaliza os dados de algumas tabelas, permitindo a criação das chaves estrangeiras.
+        Aplica correções estáticas nos dados e, em seguida, adiciona as
+        chaves primárias restantes (das tabelas grandes).
         """
-        if self.conn is None:
-            self.conn = self._connect()
+        if self.conn is None: self.conn = self._connect()
+        # A ordem original é restaurada: primeiro o patch, depois as PKs restantes.
         apply_static_fixes(self.conn, engine="postgres")
-
+        self._add_primary_keys()
 
     def enable_foreign_keys(self):
-        """
-        Cria as chaves estrangeiras definidas em "keys".
-        """
+        """Cria as chaves estrangeiras definidas no SCHEMA."""
         try:
             print_log("CRIANDO CHAVES ESTRANGEIRAS...", level="task")
-
-            if self.conn is None:
-                self.conn = self._connect()
-
+            if self.conn is None: self.conn = self._connect()
+            self.conn.autocommit = False
             cur = self.conn.cursor()
 
-            for table, foreign_keys in keys.get("foreign", {}).items():
-                for i, fk in enumerate(foreign_keys):
-                    constraint_name = f"fk_{table}_{i + 1}"
+            for table_name, definition in SCHEMA.items():
+                if 'foreign_keys' in definition:
+                    for i, fk in enumerate(definition['foreign_keys'], start=1):
+                        constraint_name = f"fk_{table_name}_{i}"
+                        fk_columns = ', '.join(f'"{col}"' for col in fk['columns'])
 
-                    # Verifica se a constraint já existe
-                    cur.execute("""
-                                SELECT 1
-                                FROM information_schema.table_constraints
-                                WHERE constraint_name = %s
-                                  AND table_name = %s
-                                  AND constraint_type = 'FOREIGN KEY';
-                                """, (constraint_name, table))
+                        # Extrai o nome da tabela referenciada e as colunas
+                        ref_table_and_cols = fk['references']
+                        ref_table = ref_table_and_cols.split('(')[0]
+                        ref_cols_str = ref_table_and_cols.split('(')[1].replace(')', '')
+                        ref_cols = ', '.join(f'"{c.strip()}"' for c in ref_cols_str.split(','))
 
-                    if cur.fetchone():
-                        continue
+                        fk_sql = f'FOREIGN KEY ({fk_columns}) REFERENCES public."{ref_table}"({ref_cols})'
 
-                    alter_sql = f'ALTER TABLE "{table}" ADD CONSTRAINT {constraint_name} {fk};'
-                    cur.execute(alter_sql)
+                        try:
+                            cur.execute(
+                                f'ALTER TABLE public."{table_name}" ADD CONSTRAINT "{constraint_name}" {fk_sql};')
+                        except psycopg2.Error as e:
+                            if e.pgcode == '42710':  # 42710 = duplicate_object (nome da constraint)
+                                print_log(f"Constraint {constraint_name} já existe, pulando.", level="info")
+                                self.conn.rollback()
+                            else:
+                                print_log(f"ERRO AO ADICIONAR FK '{constraint_name}' em '{table_name}': {e}",
+                                          level="error")
+                                self.conn.rollback()  # Garante rollback em outros erros
+                                raise e
 
             self.conn.commit()
             print_log("CHAVES ESTRANGEIRAS CRIADAS", level="success")
-
         except psycopg2.Error as e:
             print_log(f"ERRO AO CRIAR FKs: {e}", level="error")
             raise
-
+        finally:
+            if self.conn: self.conn.autocommit = True
 
     def create_indexes(self):
-        """
-        Cria índices recomendados para melhorar desempenho de consultas.
-        """
+        """Cria os índices definidos no SCHEMA."""
         try:
             print_log("CRIANDO ÍNDICES...", level="task")
-
-            if self.conn is None:
-                self.conn = self._connect()
-
+            if self.conn is None: self.conn = self._connect()
+            self.conn.autocommit = True
             cur = self.conn.cursor()
 
-            total_indexes = len(indexes)
-            width = len(str(total_indexes))
-            for i, stmt in enumerate(indexes, start=1):
+            all_indexes = []
+            for table_name, definition in SCHEMA.items():
+                if 'indexes' in definition:
+                    for index in definition['indexes']:
+                        all_indexes.append((table_name, index))
+
+            total = len(all_indexes)
+            width = len(str(total))
+            for i, (table_name, index) in enumerate(all_indexes, start=1):
+                index_name = "desconhecido"
                 try:
+                    index_name = index['name']
+                    index_cols = ', '.join(f'"{col}"' for col in index['columns'])
+                    stmt = f'CREATE INDEX IF NOT EXISTS "{index_name}" ON public."{table_name}" ({index_cols});'
                     cur.execute(stmt)
-                    match = re.search(r"INDEX\s+IF\s+NOT\s+EXISTS\s+(\w+)\s+ON", stmt, re.IGNORECASE)
-                    index_name = match.group(1) if match else "?"
-                    print_log(f"[{i:0{width}}/{total_indexes}] ÍNDICE CRIADO: {index_name}", level="info")
-                except psycopg2.Error as e:
-                    print_log(f"Erro ao criar índice: {e}", level="error")
+                    print_log(f"[{i:0{width}}/{total}] ÍNDICE CRIADO: {index_name}", level="info")
+                except (psycopg2.Error, KeyError) as e:
+                    print_log(f"Erro ao criar índice {index_name}: {e}", level="error")
 
             print_log("TODOS OS ÍNDICES FORAM CRIADOS", level="success")
-
         except psycopg2.Error as e:
             print_log(f"ERRO AO CRIAR ÍNDICES: {e}", level="error")
             raise
 
-
     def initialize_schema(self) -> None:
-        """
-        Fluxo de inicialização do script_sql:
-          1) cria banco se não existir
-          2) drop_database
-          3) create_tables
-        """
+        """Executa o fluxo completo de criação do schema."""
         try:
             self._create_database()
-            self.drop_database()
+            self.conn = self._connect()
+            self.drop_tables()
             self.create_tables()
         finally:
             if self.conn:
