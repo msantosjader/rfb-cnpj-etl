@@ -81,7 +81,7 @@ def convert_rows_to_csv_buffer(rows: List[List[Union[str, int, float, None]]]) -
     """Converte uma lista de linhas em um buffer de bytes CSV para o COPY do Postgres."""
     text_buffer = StringIO()
     writer = csv.writer(text_buffer, delimiter=';', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
-    writer.writerows(rows)  # Simplificado: writerows lida com a conversão e Nulos corretamente
+    writer.writerows(rows)
     byte_buffer = BytesIO(text_buffer.getvalue().encode("windows-1252"))
     byte_buffer.seek(0)
     return byte_buffer

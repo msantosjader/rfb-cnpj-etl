@@ -1,4 +1,4 @@
-# cnpj_public_data.py
+# cnpj_data/cnpj_public_data.py
 
 """
 Módulo para acessar os dados de CNPJ disponíveis no site da Receita Federal.
@@ -9,8 +9,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from typing import Dict, Tuple, Optional
-
-from config import CNPJ_DATA_URL
+from ..config import CNPJ_DATA_URL
 
 
 class CNPJDataScraper:

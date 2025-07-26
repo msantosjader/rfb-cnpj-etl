@@ -1,13 +1,15 @@
+# db/postgres_loader.py
+
 import gc
 import psycopg2
 from queue import Queue
 from threading import Thread, Lock
 from typing import Optional, Any, Dict
-from config import QUEUE_SIZE, WORKER_THREADS, DEBUG_LOG
-from utils.logger import print_log
-from utils.progress import pbar, update_progress
-from utils.db_batch_producer import produce_batches
-from utils.db_transformers import transform_batch, convert_rows_to_csv_buffer
+from ..config import QUEUE_SIZE, WORKER_THREADS, DEBUG_LOG
+from ..utils.logger import print_log
+from ..utils.progress import pbar, update_progress
+from ..utils.db_batch_producer import produce_batches
+from ..utils.db_transformers import transform_batch, convert_rows_to_csv_buffer
 
 
 def consume_batches(insertion_queue, postgres_config: dict, thread_id: int,

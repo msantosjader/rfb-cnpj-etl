@@ -1,6 +1,7 @@
 # Logs de Execução do ETL da Base de Dados CNPJ (Receita Federal)
 
 ## Download da base de dados
+
 ```bash
 🕒 15:01:31 |⏱️ 00:00:00 |🚀 INICIANDO DOWNLOAD...
 🕒 15:01:35 |⏱️ 00:00:04 |🌐 37 ARQUIVOS DISPONÍVEIS NO SITE DA RECEITA FEDERAL (04/2025)
@@ -10,6 +11,7 @@ Estabelecimentos9.zip |   0.4%                 | 00:26:49 |  1.25MB de   319MB |
 ```
 
 ## Carga do banco de dados
+
 ```bash
 🕒 11:38:03 |⏱️ 00:00:00 |🚀️ INICIANDO TAREFAS DO BANCO DE DADOS
 🕒 11:38:05 |⏱️ 00:00:01 |📋 VALIDAÇÃO DOS ARQUIVOS ZIP...

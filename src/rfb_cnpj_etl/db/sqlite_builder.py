@@ -1,4 +1,4 @@
-# sqlite_builder.py
+# db/sqlite_builder.py
 
 """
 Módulo para construção do banco de dados SQLite.
@@ -7,10 +7,10 @@ Módulo para construção do banco de dados SQLite.
 import os
 import sqlite3
 from typing import Dict, Any, Optional
-from config import SQLITE_DB_PATH
-from db.schema import SCHEMA
-from utils.db_patch import apply_static_fixes
-from utils.logger import print_log
+from ..config import SQLITE_DB_PATH
+from ..db.schema import SCHEMA
+from ..utils.db_patch import apply_static_fixes
+from ..utils.logger import print_log
 
 
 class SQLiteBuilder:

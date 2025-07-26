@@ -1,8 +1,10 @@
+# cnpj.py
+
 import argparse
-from orchestrator import run_orchestrator
-from cnpj_data import CNPJDataScraper, CNPJDownloadManager
-from utils.logger import print_log
-from config import DEFAULT_PARALLEL, DEFAULT_LOW_MEMORY, DEFAULT_ENGINE, SQLITE_DB_PATH, POSTGRES, ENGINE_OPTIONS
+from .orchestrator import run_orchestrator
+from .cnpj_data import CNPJDataScraper, CNPJDownloadManager
+from .utils.logger import print_log
+from .config import DEFAULT_PARALLEL, DEFAULT_LOW_MEMORY, DEFAULT_ENGINE, SQLITE_DB_PATH, POSTGRES, ENGINE_OPTIONS
 
 
 def str2bool(value):
@@ -84,11 +86,11 @@ def main() -> None:
     try:
         if args.command == "get-availables":
             data = CNPJDataScraper()
-            print_log(data.get_availabes(), level="info", time=False)
+            print_log(data.get_availabes(), level="docs", time=False)
 
         elif args.command == "get-latest":
             data = CNPJDataScraper()
-            print_log(data.get_latest(), level="info", time=False)
+            print_log(data.get_latest(), level="docs", time=False)
 
         elif args.command == "get-urls":
             data = CNPJDataScraper()

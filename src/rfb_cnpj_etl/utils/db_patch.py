@@ -1,11 +1,11 @@
-# db_patch.py
+# utils/db_patch.py
 
 """
 Aplica correções estáticas na base de dados.
 """
 
-from config import DEFAULT_ENGINE
-from utils.logger import print_log
+from ..config import DEFAULT_ENGINE
+from ..utils.logger import print_log
 
 
 def apply_static_fixes(conn, engine: str = DEFAULT_ENGINE):
@@ -57,9 +57,6 @@ def apply_static_fixes(conn, engine: str = DEFAULT_ENGINE):
                     """)
 
         if engine == "postgres":
-            # A query é a mesma que funcionou no pgAdmin.
-            # Ela deleta duplicatas baseadas no 'cnpj_basico',
-            # priorizando manter a linha que tem 'razao_social' preenchida.
             query_delete_duplicatas = """
                                       DELETE \
                                       FROM empresa

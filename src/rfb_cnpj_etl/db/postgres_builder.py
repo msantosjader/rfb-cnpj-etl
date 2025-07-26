@@ -5,9 +5,9 @@ Módulo para construção do banco de dados PostgreSQL.
 """
 
 import psycopg2
-from db.schema import SCHEMA
-from utils.db_patch import apply_static_fixes
-from utils.logger import print_log
+from ..db.schema import SCHEMA
+from ..utils.db_patch import apply_static_fixes
+from ..utils.logger import print_log
 
 
 class PostgresBuilder:
@@ -62,7 +62,7 @@ class PostgresBuilder:
             for (table_name,) in cur.fetchall():
                 cur.execute(f'DROP TABLE IF EXISTS "{table_name}" CASCADE;')
             conn.close()
-            print_log("TABELAS ANTERIORES REMOVIDAS", level="info")
+            print_log("TABELAS ANTERIORES REMOVIDAS", level="docs")
         except psycopg2.Error as e:
             print_log(f"ERRO AO EXCLUIR TABELAS: {e}", level="error")
             raise
@@ -113,12 +113,12 @@ class PostgresBuilder:
                 sql_command = f'ALTER TABLE public."{table_name}" ADD PRIMARY KEY ({pk_cols_str});'
 
                 try:
-                    print_log(f"  -> Adicionando PK em '{table_name}'...", level="info")
+                    print_log(f"  -> Adicionando PK em '{table_name}'...", level="docs")
                     cur.execute(sql_command)
                 except psycopg2.Error as e:
                     # 42P16 = multiple_primary_keys, 42P07 = relation_already_exists
                     if e.pgcode in ('42P16', '42P07'):
-                        print_log(f"     ℹ PK em '{table_name}' já existe, pulando.", level="info")
+                        print_log(f"     ℹ PK em '{table_name}' já existe, pulando.", level="docs")
                     else:
                         print_log(f"ERRO AO ADICIONAR PK em '{table_name}': {e}", level="error")
                         raise
@@ -162,7 +162,7 @@ class PostgresBuilder:
                                 f'ALTER TABLE public."{table_name}" ADD CONSTRAINT "{constraint_name}" {fk_sql};')
                         except psycopg2.Error as e:
                             if e.pgcode == '42710':  # 42710 = duplicate_object (nome da constraint)
-                                print_log(f"Constraint {constraint_name} já existe, pulando.", level="info")
+                                print_log(f"Constraint {constraint_name} já existe, pulando.", level="docs")
                                 self.conn.rollback()
                             else:
                                 print_log(f"ERRO AO ADICIONAR FK '{constraint_name}' em '{table_name}': {e}",
@@ -201,7 +201,7 @@ class PostgresBuilder:
                     index_cols = ', '.join(f'"{col}"' for col in index['columns'])
                     stmt = f'CREATE INDEX IF NOT EXISTS "{index_name}" ON public."{table_name}" ({index_cols});'
                     cur.execute(stmt)
-                    print_log(f"[{i:0{width}}/{total}] ÍNDICE CRIADO: {index_name}", level="info")
+                    print_log(f"[{i:0{width}}/{total}] ÍNDICE CRIADO: {index_name}", level="docs")
                 except (psycopg2.Error, KeyError) as e:
                     print_log(f"Erro ao criar índice {index_name}: {e}", level="error")
 

@@ -1,4 +1,4 @@
-# database/schema.py
+# db/schema.py
 
 """
 Define o schema completo do banco de dados da base CNPJ, incluindo o mapeamento

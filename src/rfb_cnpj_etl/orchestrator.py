@@ -6,11 +6,11 @@ Orquestração da carga de dados
 
 import os
 from typing import Optional
-from cnpj_data import CNPJDataScraper
-from db import SQLiteBuilder, run_sqlite_loader, PostgresBuilder, run_postgres_loader
-from utils.logger import print_log
-from utils.zip_metadata import validate_zip_files, estimate_total_lines_from_size
-from config import (
+from .cnpj_data import CNPJDataScraper
+from .db import SQLiteBuilder, run_sqlite_loader, PostgresBuilder, run_postgres_loader
+from .utils.logger import print_log
+from .utils.zip_metadata import validate_zip_files, estimate_total_lines_from_size
+from .config import (
     DEFAULT_ENGINE,
     DEFAULT_PARALLEL,
     DEFAULT_LOW_MEMORY,

@@ -1,4 +1,4 @@
-# cnpj_downloader.py
+# cnpj_data/cnpj_downloader.py
 
 """
 Módulo para baixar os arquivos de dados de CNPJ disponíveis no site da Receita Federal.
@@ -13,8 +13,8 @@ from queue import PriorityQueue
 from tqdm import tqdm
 from typing import Dict, Optional
 from .cnpj_public_data import CNPJDataScraper
-from utils.logger import print_log, get_timestamp
-from config import (
+from ..utils.logger import print_log, get_timestamp
+from ..config import (
     CNPJ_DATA_URL,
     DOWNLOAD_DIR, DOWNLOAD_MAX_CONCURRENTS, BROWSER_AGENTS,
     DOWNLOAD_CHUNK_SIZE, DOWNLOAD_CHUNK_TIMEOUT, DOWNLOAD_MAX_RETRIES

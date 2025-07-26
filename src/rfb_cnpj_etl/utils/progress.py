@@ -1,4 +1,4 @@
-# progress.py
+# utils/progress.py
 
 """
 Barra de progresso.
@@ -6,7 +6,7 @@ Barra de progresso.
 
 from os.path import basename
 from tqdm import tqdm
-from utils.logger import print_log
+from ..utils.logger import print_log
 
 
 def pbar(total: int, desc: str = "INSERINDO DADOS..."):

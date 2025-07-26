@@ -6,12 +6,12 @@ from pathlib import Path
 import zipfile
 import csv
 import time
-from .logger import print_log
-from db.schema import SCHEMA
 from io import TextIOWrapper
-from config import BATCH_SIZE, BATCH_RATIO
 from typing import Optional, List, Dict
 from threading import Thread
+from .logger import print_log
+from ..db.schema import SCHEMA
+from ..config import BATCH_SIZE, BATCH_RATIO
 
 
 def get_targets_from_zip_name(zip_name: str) -> List[Dict]:

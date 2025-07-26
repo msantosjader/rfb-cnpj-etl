@@ -4,9 +4,11 @@ Foram realizados ajustes (adições e exclusões) para corrigir inconsistências
 As divergências foram encontradas ao tentar criar chaves estrangeiras em tabelas relacionadas.
 
 ---
+
 ## 🟢 Adições
 
 ### `qualificacao_socio`
+
 Código presente na tabela `empresa`, mas sem correspondência em `qualificacao_socio`.
 
 | cod_qualificacao | nome_qualificacao |
@@ -16,17 +18,19 @@ Código presente na tabela `empresa`, mas sem correspondência em `qualificacao_
 ---
 
 ### `motivo` (situação cadastral)
+
 Códigos de motivo de situação cadastral utilizados em `estabelecimento`, mas ausentes na tabela `motivo`.
 
-| cod_motivo | nome_motivo                                                                  |
-|------------|-------------------------------------------------------------------------------|
-| 32         | DECURSO DE PRAZO DE INTERRUPCAO TEMPORARIA                                   |
-| 81         | SOLICITACAO DA ADMINISTRACAO TRIBUTARIA MUNICIPAL/ESTADUAL - SC              |
-| 93         | CNPJ - TITULAR BAIXADO                                                       |
+| cod_motivo | nome_motivo                                                     |
+|------------|-----------------------------------------------------------------|
+| 32         | DECURSO DE PRAZO DE INTERRUPCAO TEMPORARIA                      |
+| 81         | SOLICITACAO DA ADMINISTRACAO TRIBUTARIA MUNICIPAL/ESTADUAL - SC |
+| 93         | CNPJ - TITULAR BAIXADO                                          |
 
 ---
 
 ### `pais`
+
 Códigos de país encontrados em `estabelecimento` e `socio`, mas que não existiam na tabela `pais`.
 
 | cod_pais | nome_pais                               |
@@ -54,6 +58,7 @@ Códigos de país encontrados em `estabelecimento` e `socio`, mas que não exist
 ## 🔴 Exclusões
 
 ### `simples`
+
 Registros da tabela `simples` que não possuem correspondência nas tabelas `empresa` nem `estabelecimento`.
 
 | cnpj_basico |

@@ -7,13 +7,13 @@ Módulo para carregamento de dados no banco de dados SQLite.
 import gc
 import sqlite3
 from queue import Queue
-from config import QUEUE_SIZE, DEBUG_LOG
+from ..config import QUEUE_SIZE, DEBUG_LOG
 from threading import Thread
 from typing import Optional
-from utils.logger import print_log
-from utils.progress import pbar, update_progress
-from utils.db_batch_producer import produce_batches
-from utils.db_transformers import transform_batch
+from ..utils.logger import print_log
+from ..utils.progress import pbar, update_progress
+from ..utils.db_batch_producer import produce_batches
+from ..utils.db_transformers import transform_batch
 
 
 def consume_batches(insertion_queue, db_path: str, total_records: int, low_memory: bool):

@@ -1,7 +1,7 @@
-
 # Comando `download`
 
-O comando `download` permite baixar localmente os arquivos ZIP de dados abertos do CNPJ diretamente do site da Receita Federal.
+O comando `download` permite baixar localmente os arquivos ZIP de dados abertos do CNPJ diretamente do site da Receita
+Federal.
 
 ---
 
@@ -18,12 +18,12 @@ Se nenhuma flag for informada:
 
 ## Flags Disponíveis
 
-| Flag              | Tipo          | Padrão             | Descrição                                                                 |
-|-------------------|---------------|--------------------|---------------------------------------------------------------------------|
-| `--month`         | `<MM/AAAA>…`  | Último mês         | Lista de meses para baixar. Ex: `--month 03/2025 04/2025`.                |
-| `--download-dir`  | `<path>`      | `data/downloads`   | Diretório onde os arquivos `.zip` serão salvos.                           |
-| `--workers`       | `<int>`       | `10`               | Número máximo de downloads concorrentes.                                 |
-| `--clean`         | _flag_        | Inativo            | Se presente, remove arquivos `.zip` e `.part` antes de baixar.           |
+| Flag             | Tipo         | Padrão           | Descrição                                                      |
+|------------------|--------------|------------------|----------------------------------------------------------------|
+| `--month`        | `<MM/AAAA>…` | Último mês       | Lista de meses para baixar. Ex: `--month 03/2025 04/2025`.     |
+| `--download-dir` | `<path>`     | `data/downloads` | Diretório onde os arquivos `.zip` serão salvos.                |
+| `--workers`      | `<int>`      | `10`             | Número máximo de downloads concorrentes.                       |
+| `--clean`        | _flag_       | Inativo          | Se presente, remove arquivos `.zip` e `.part` antes de baixar. |
 
 ---
 
@@ -87,4 +87,5 @@ Equivalente a: baixar o mês mais recente, salvar na pasta padrão, sem remover 
 
 - O mês deve ser informado no formato `MM/AAAA`.
 - Caso omita `--month`, o script irá baixar sempre o mês mais recente disponível.
-- Os valores padrão (`DOWNLOAD_DEFAULT_PATH`, `DOWNLOAD_MAX_CONCURRENTS`, etc.) podem ser alterados no arquivo `config.py`.
+- Os valores padrão (`DOWNLOAD_DEFAULT_PATH`, `DOWNLOAD_MAX_CONCURRENTS`, etc.) podem ser alterados no arquivo
+  `config.py`.

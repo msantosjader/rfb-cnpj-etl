@@ -8,8 +8,8 @@ import io
 import os
 import zipfile
 from collections import defaultdict
-from cnpj_data.cnpj_public_data import CNPJDataScraper
-from config import AVG_COMPRESSED_LINE_SIZE_BYTES
+from ..cnpj_data.cnpj_public_data import CNPJDataScraper
+from ..config import AVG_COMPRESSED_LINE_SIZE_BYTES
 from .logger import print_log
 
 
@@ -18,8 +18,8 @@ def validate_zip_files(month_year: str, files_dir: str):
     Valida os arquivos baixados.
     """
     print_log(f"VALIDAÇÃO DOS ARQUIVOS ZIP...", level="task")
-    print_log(f"PERÍODO: {month_year}", level="info")
-    print_log(f"LOCAL: {files_dir}", level="info")
+    print_log(f"PERÍODO: {month_year}", level="docs")
+    print_log(f"LOCAL: {files_dir}", level="docs")
 
     if not os.path.exists(files_dir):
         raise FileNotFoundError(f"DIRETÓRIO NÃO ENCONTRADO: {files_dir}")
@@ -81,7 +81,7 @@ def estimate_total_lines_from_size(directory_path: str) -> int:
         return 0
 
     if total_size_bytes == 0:
-        print_log("Nenhum arquivo .zip encontrado ou o diretório está vazio.", level="info")
+        print_log("Nenhum arquivo .zip encontrado ou o diretório está vazio.", level="docs")
         return 0
 
     if AVG_COMPRESSED_LINE_SIZE_BYTES <= 0:
@@ -93,7 +93,7 @@ def estimate_total_lines_from_size(directory_path: str) -> int:
 
     print_log(
         f"Estimativa de linhas: {total_size_bytes / (1024 ** 3):.2f} GB de arquivos / {AVG_COMPRESSED_LINE_SIZE_BYTES} bytes/linha = ~{int(rounded_estimated_lines):,} de registros".replace(
-            ",", "."), level="info")
+            ",", "."), level="docs")
     return int(rounded_estimated_lines)
 
 
@@ -140,5 +140,5 @@ def estimate_total_lines_alternative(files_dir: str, encoding: str = 'latin1') -
             group_line_count = first + (second * (n - 1))
         total_lines += group_line_count
 
-    print_log(f"TOTAL DE REGISTROS: {total_lines:,.0f}".replace(",", "."), level="info")
+    print_log(f"TOTAL DE REGISTROS: {total_lines:,.0f}".replace(",", "."), level="docs")
     return total_lines

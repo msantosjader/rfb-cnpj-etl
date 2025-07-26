@@ -133,14 +133,14 @@ python cnpj.py db load
 Os logs exibem detalhadamente o progresso de cada etapa (download, validação dos arquivos, preparação do banco de dados,
 carga dos dados por arquivo, criação dos índices).
 
-Veja exemplos em [logs.md](info/logs.md).
+Veja exemplos em [logs.md](docs/logs.md).
 
 ---
 
 ### Outros comandos
 
 - Exemplos de uso com **todas as flags disponíveis** estão nos
-  arquivos [complete.md](info/cli/complete.md), [download.md](info/cli/download.md) e [db_load.md](info/cli/db_load.md).
+  arquivos [complete.md](docs/cli/complete.md), [download.md](docs/cli/download.md) e [db_load.md](docs/cli/db_load.md).
 
 - Utilize `python cnpj.py --help` para ver os comandos e argumentos disponíveis.
 
@@ -186,44 +186,49 @@ O modelo relacional do banco de dados pode ser visualizado nos arquivos abaixo:
 ## Estrutura do Projeto
 
 ```bash
-rfb-cnpj-etl/                   
-├── cnpj.py                     # Script principal com argparse
-├── orchestrator.py             # Orquestrador de etapas
-├── config.py                   # Configurações gerais e constantes
-├── requirements.txt            # Dependências do projeto
-├── assets/                     # Dados e arquivos auxiliares
-│   ├── cnpj-metadados.pdf      # Dicionário de Dados do Cadastro Nacional da Pessoa Jurídica
-│   ├── postgres_script.sql     # Script SQL para criação do banco de dados PostgreSQL (já é criado automaticamente na execução)
-│   ├── database_erd.pgerd      # Diagrama do banco de dados PostgreSQL
-│   ├── postgres_erd.png        # Imagem do diagrama do banco de dados PostgreSQL
-├── cnpj_data/                  # Lógica para download e scraping da base de dados CNPJ
-│   ├── __init__.py             
-│   ├── cnpj_public_data.py     # Captura os dados da RFB
-│   ├── cnpj_downloader.py      # Gerencia o download dos arquivos
-├── db/                         # Módulos para schema, carga e controle de banco
-│   ├── __init__.py             
-│   ├── postgres_builder.py     # Criação do banco de dados (PostgreSQL)
-│   ├── postgres_loader.py      # Carregamento dos dados no banco (PostgreSQL)
-│   ├── sqlite_builder.py       # Criação do banco de dados (SQLite)
-│   ├── sqlite_loader.py        # Carregamento dos dados no banco (SQLite)
-│   ├── schema.py               # Esquema do banco de dados (tabelas, chaves e índices)
-├── info/                       # Documentação do projeto           
-│   └── exemplos/               # Exemplos de consultas
-│       └── query_postgres.md   # Para PostgreSQL
-│       └── query_sqlite.md     # Para SQLite
-│   └── cli/                    # Comandos e documentação do CLI
-│       └── complete.md         # Documentação do comando 'complete'
-│       └── db_load.md          # Documentação do comando 'db load'
-│       └── download.md         # Documentação do comando 'download'
-│   ├── normalizacao.md         # Ajustes realizados nos dados carregados
-├── utils/                      # Funções utilitárias
-│   ├── logger.py               # Print personalizado com hora e tempo de execução
-│   ├── progress.py             # Barra e log de progresso
-│   ├── db_transformers.py      # Transformação de dados para o banco
-│   ├── db_batch_producer.py    # Geração de lotes de dados para carga
-├── data/                       # Diretório padrão para o banco de dados (SQLite) e downloads
-│   └── downloads/              # Diretório padrão para downloads
+rfb-cnpj-etl/
+├── src/
+│   └── rfb_cnpj_etl/
+│       ├── cnpj.py                     # Script principal com argparse
+│       ├── orchestrator.py             # Orquestrador de etapas
+│       ├── config.py                   # Configurações gerais e constantes
+│       ├── cnpj_data/                  # Lógica para download e scraping da base de dados CNPJ
+│       │   ├── __init__.py             
+│       │   ├── cnpj_public_data.py     # Captura os dados da RFB
+│       │   └── cnpj_downloader.py      # Gerencia o download dos arquivos
+│       ├── db/                         # Módulos para schema, carga e controle de banco
+│       │   ├── __init__.py             
+│       │   ├── postgres_builder.py     # Criação do banco de dados (PostgreSQL)
+│       │   ├── postgres_loader.py      # Carregamento dos dados no banco (PostgreSQL)
+│       │   ├── sqlite_builder.py       # Criação do banco de dados (SQLite)
+│       │   ├── sqlite_loader.py        # Carregamento dos dados no banco (SQLite)
+│       │   └── schema.py               # Esquema do banco de dados (tabelas, chaves e índices)
+│       └── utils/                      # Funções utilitárias
+│           ├── __init__.py
+│           ├── logger.py               # Print personalizado com hora e tempo de execução
+│           ├── progress.py             # Barra e log de progresso
+│           ├── db_transformers.py      # Transformação de dados para o banco
+│           └── db_batch_producer.py    # Geração de lotes de dados para carga
+├── assets/                             # Dados e arquivos auxiliares
+│   ├── cnpj-metadados.pdf              # Dicionário de Dados do Cadastro Nacional da Pessoa Jurídica
+│   ├── postgres_script.sql             # Script SQL para criação do banco de dados PostgreSQL
+│   ├── database_erd.pgerd              # Diagrama do banco de dados PostgreSQL
+│   └── postgres_erd.png                # Imagem do diagrama do banco de dados PostgreSQL
+├── data/                               # Diretório padrão para o banco de dados (SQLite) e downloads
+│   └── downloads/                      # Diretório padrão para downloads
+├── docs/                               # Documentação do projeto           
+│   ├── exemplos/                       # Exemplos de consultas
+│   │   ├── query_postgres.md           # Para PostgreSQL
+│   │   └── query_sqlite.md             # Para SQLite
+│   ├── cli/                            # Comandos e documentação do CLI
+│   │   ├── complete.md                 # Documentação do comando 'complete'
+│   │   ├── db_load.md                  # Documentação do comando 'db load'
+│   │   └── download.md                 # Documentação do comando 'download'
+│   └── normalizacao.md                 # Ajustes realizados nos dados carregados
+├── .gitignore
+├── LICENSE
 ├── README.md
+└── requirements.txt                    # Dependências do projeto
 ```
 
 - Para incluir um novo banco de dados (como MySQL):

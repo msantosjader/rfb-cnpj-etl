@@ -1,4 +1,4 @@
-# logger.py
+# utils/logger.py
 
 """
 Logger para o projeto.
@@ -31,7 +31,7 @@ def print_log(msg: str, level: str = None, time: bool = True) -> None:
     Imprime uma mensagem no terminal.
     :params:
         msg: mensagem a ser impressa
-        level: nível da mensagem (info, warning, error, debug)
+        level: nível da mensagem (docs, warning, error, debug)
         time: se True, imprime o tempo decorrido desde o início da aplicação
     :return: None
     """
@@ -39,7 +39,7 @@ def print_log(msg: str, level: str = None, time: bool = True) -> None:
 
     emojis = {
         "success": "✅",
-        "info": "ℹ️",
+        "docs": "ℹ️",
         "warning": "⚠️",
         "error": "❌",
         "debug": "🐞",
