@@ -13,6 +13,7 @@ print_lock = threading.Lock()
 # momento em que a aplicação começou (para calcular tempo decorrido)
 start_time = datetime.now()
 
+
 def get_timestamp():
     """
     Retorna o timestamp atual e o tempo decorrido desde o início da aplicação.

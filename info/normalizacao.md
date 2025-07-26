@@ -29,24 +29,25 @@ Códigos de motivo de situação cadastral utilizados em `estabelecimento`, mas 
 ### `pais`
 Códigos de país encontrados em `estabelecimento` e `socio`, mas que não existiam na tabela `pais`.
 
-| cod_pais | nome_pais                                             |
-|----------|--------------------------------------------------------|
-| 008      | ABU DHABI                                              |
-| 009      | DIRCE                                                  |
-| 015      | ALAND, ILHAS                                           |
-| 150      | JERSEY                                                 |
-| 151      | CANARIAS, ILHAS                                        |
-| 200      | CURACAO                                                |
-| 321      | GUERNSEY                                               |
-| 359      | MAN, ILHA DE                                           |
-| 367      | INGLATERRA                                             |
-| 393      | JERSEY                                                 |
-| 449      | MACEDONIA (ANTIGA REP. IUGOSLAVA)                      |
-| 452      | MADEIRA, ILHA DA                                       |
-| 498      | MOLDAVIA                                               |
-| 678      | SAO TOME E PRINCIPE                                    |
-| 699      | SAO MARTINHO, ILHA DE (PARTE HOLANDESA)                |
-| 737      | SERVIA                                                 |
+| cod_pais | nome_pais                               |
+|----------|-----------------------------------------|
+| 008      | ABU DHABI                               |
+| 009      | DIRCE                                   |
+| 015      | ALAND, ILHAS                            |
+| 150      | JERSEY                                  |
+| 151      | CANARIAS, ILHAS                         |
+| 200      | CURACAO                                 |
+| 321      | GUERNSEY                                |
+| 359      | MAN, ILHA DE                            |
+| 367      | INGLATERRA                              |
+| 393      | JERSEY                                  |
+| 449      | MACEDONIA (ANTIGA REP. IUGOSLAVA)       |
+| 452      | MADEIRA, ILHA DA                        |
+| 498      | MOLDAVIA                                |
+| 678      | SAO TOME E PRINCIPE                     |
+| 699      | SAO MARTINHO, ILHA DE (PARTE HOLANDESA) |
+| 737      | SERVIA                                  |
+| 994      | AZERBAIJAO                              |
 
 ---
 

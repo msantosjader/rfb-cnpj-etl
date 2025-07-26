@@ -5,11 +5,10 @@ Módulo para construção do banco de dados SQLite.
 """
 
 import os
-import re
 import sqlite3
-from typing import Optional
+from typing import Dict, Any, Optional
 from config import SQLITE_DB_PATH
-from db.schema import indexes, tables, keys
+from db.schema import SCHEMA
 from utils.db_patch import apply_static_fixes
 from utils.logger import print_log
 
@@ -23,9 +22,10 @@ class SQLiteBuilder:
         tables: dicionário de tabelas e colunas.
         conn: conexão com o banco de dados.
     """
+
     def __init__(self, db_path: Optional[str] = SQLITE_DB_PATH):
         self.db_path = db_path
-        self.tables = tables
+        self.schema: Dict[str, Any] = SCHEMA
         self.conn = None
 
     def _connect(self) -> sqlite3.Connection:
@@ -43,16 +43,20 @@ class SQLiteBuilder:
             print_log(f"ERRO AO CONECTAR NO BANCO: {e}", level="error")
             raise
 
+    def _close_connection(self):
+        if self.conn:
+            try:
+                self.conn.close()
+            except sqlite3.Error:
+                pass
+            self.conn = None
+
     def drop_database(self) -> None:
         """
         Fecha conexão pendente e exclui o arquivo .db, se existir.
         """
         try:
-            if self.conn:
-                self.conn.close()
-                self.conn = None
-                print_log("CONEXÃO EXISTENTE FECHADA", level="info")
-
+            self._close_connection()
             if os.path.exists(self.db_path):
                 os.remove(self.db_path)
 
@@ -66,44 +70,27 @@ class SQLiteBuilder:
 
         As FKs permanecem desativadas até a chamada posterior de "enable_foreign_keys()".
         """
+        if self.conn is None: self.conn = self._connect()
         try:
             print_log("CRIANDO TABELAS...", level="task")
-
-            if self.conn is None:
-                self.conn = self._connect()
-
             cur = self.conn.cursor()
-            for meta in self.tables.values():
-                name = meta["nome_tabela"]
-
-                # drop table, se existir
-                cur.execute(f'DROP TABLE IF EXISTS "{name}"')
-
-                # monta as colunas
-                cols = [f"{col} {tipo}" for col, tipo in meta["colunas"].items()]
-
-                # adiciona as chaves primárias
-                pk_cols = keys["primary"].get(name)
-                if pk_cols:
-                    cols.append(f"PRIMARY KEY ({', '.join(pk_cols)})")
-
-                # adiciona as chaves estrangeiras
-                for fk in keys["foreign"].get(name, []):
-                    cols.append(fk)
-
-                # cria as tabelas
-                ddl = (
-                        f'CREATE TABLE "{name}" (\n    '
-                        + ",\n    ".join(cols)
-                        + "\n);"
-                )
+            for table_name, spec in self.schema.items():
+                cur.execute(f'DROP TABLE IF EXISTS "{table_name}"')
+                columns_defs = [f'"{col[0]}" {col[1]}' for col in spec['columns']]
+                if 'primary_key' in spec:
+                    pk_cols = ', '.join([f'"{col}"' for col in spec['primary_key']])
+                    columns_defs.append(f'PRIMARY KEY ({pk_cols})')
+                if 'foreign_keys' in spec:
+                    for fk in spec['foreign_keys']:
+                        fk_cols = ', '.join([f'"{col}"' for col in fk['columns']])
+                        columns_defs.append(f"FOREIGN KEY ({fk_cols}) REFERENCES {fk['references']}")
+                ddl = f'CREATE TABLE "{table_name}" (\n    ' + ',\n    '.join(columns_defs) + '\n);'
                 cur.execute(ddl)
-
             self.conn.commit()
-            print_log("TABELAS CRIADAS", level="success")
-        except sqlite3.Error as e:
-            print_log(f"ERRO AO CRIAR TABELAS: {e}", level="error")
+        except sqlite3.Error:
             raise
+        finally:
+            self._close_connection()
 
     def patch_data(self):
         """
@@ -113,16 +100,14 @@ class SQLiteBuilder:
             self.conn = self._connect()
         apply_static_fixes(self.conn, engine="sqlite")
 
-
     def enable_foreign_keys(self) -> None:
         """
         Ativa a verificação de chaves estrangeiras no SQLite.
         """
+        if self.conn is None: self.conn = self._connect()
         try:
             print_log("ATIVANDO CHAVES ESTRANGEIRAS...", level="task")
 
-            if self.conn is None:
-                self.conn = self._connect()
             self.conn.execute("PRAGMA foreign_keys = ON;")
             self.conn.commit()
 
@@ -131,41 +116,40 @@ class SQLiteBuilder:
             print_log(f"ERRO AO ATIVAR CHAVES ESTRANGEIRAS: {e}", level="error")
             raise
         finally:
-            if self.conn:
-                self.conn.close()
-                self.conn = None
-
+            self._close_connection()
 
     def create_indexes(self) -> None:
         """
         Cria índices recomendados para melhorar desempenho de consultas.
         """
+        if self.conn is None: self.conn = self._connect()
         try:
             print_log("CRIANDO ÍNDICES...", level="task")
-
-            if self.conn is None:
-                self.conn = self._connect()
 
             cur = self.conn.cursor()
 
             # PRAGMAs para acelerar o trabalho
             cur.execute("PRAGMA journal_mode=MEMORY;")
             cur.execute("PRAGMA synchronous=OFF;")
-            cur.execute("PRAGMA temp_store=MEMORY;")
-            cur.execute("PRAGMA cache_size=-128000;")
-            cur.execute("PRAGMA locking_mode = EXCLUSIVE;")
             cur.execute("PRAGMA foreign_keys = OFF;")
 
-            total_indexes = len(indexes)
-            width = len(str(total_indexes))
-            for i, stmt in enumerate(indexes, start=1):
-                try:
-                    cur.execute(stmt)
-                    match = re.search(r"INDEX\s+IF\s+NOT\s+EXISTS\s+(\w+)\s+ON", stmt, re.IGNORECASE)
-                    index_name = match.group(1) if match else "?"
-                    print_log(f"[{i:0{width}}/{total_indexes}] ÍNDICE CRIADO: {index_name}", level="info")
-                except sqlite3.Error as e:
-                    print_log(f"ERRO NO ÍNDICE ({stmt}): {e}", level="error")
+            total_indexes = sum(len(spec.get('indexes', [])) for spec in self.schema.values())
+            indexes_done = 0
+
+            for table_name, spec in self.schema.items():
+                if 'indexes' in spec:
+                    for index in spec['indexes']:
+                        index_name = index['name']
+                        index_cols = ', '.join(index['columns'])
+
+                        print_log(
+                            f" {indexes_done + 1} de {total_indexes} | CRIANDO ÍNDICE '{index_name}' NA TABELA '{table_name}' (Colunas: {index_cols})... ",
+                            level="task")
+
+                        stmt = f"CREATE INDEX IF NOT EXISTS \"{index_name}\" ON \"{table_name}\" ({', '.join(f'\"{col}\"' for col in index['columns'])});"
+                        cur.execute(stmt)
+
+                        indexes_done += 1
 
             self.conn.commit()
             print_log("ÍNDICES CRIADOS", level="success")
@@ -175,9 +159,7 @@ class SQLiteBuilder:
             raise
 
         finally:
-            if self.conn:
-                self.conn.close()
-                self.conn = None
+            self._close_connection()
 
     def initialize_schema(self) -> None:
         """
@@ -185,10 +167,5 @@ class SQLiteBuilder:
           1) drop_database
           2) create_tables
         """
-        try:
-            self.drop_database()
-            self.create_tables()
-        finally:
-            if self.conn:
-                self.conn.close()
-                self.conn = None
+        self.drop_database()
+        self.create_tables()

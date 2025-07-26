@@ -9,7 +9,7 @@ from typing import Optional
 from cnpj_data import CNPJDataScraper
 from db import SQLiteBuilder, run_sqlite_loader, PostgresBuilder, run_postgres_loader
 from utils.logger import print_log
-from utils.zip_metadata import validate_zip_files, estimate_total_lines
+from utils.zip_metadata import validate_zip_files, estimate_total_lines_from_size
 from config import (
     DEFAULT_ENGINE,
     DEFAULT_PARALLEL,
@@ -70,7 +70,7 @@ def run_orchestrator(
             raise
 
         # estimar linhas totais para controlar o progresso
-        estimated_lines = estimate_total_lines(files_dir) # 196_894_499
+        estimated_lines = estimate_total_lines_from_size(files_dir)
 
     # instanciar o builder adequado
     if engine == "sqlite":

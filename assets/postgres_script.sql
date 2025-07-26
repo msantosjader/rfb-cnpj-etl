@@ -12,18 +12,19 @@ CREATE UNLOGGED TABLE IF NOT EXISTS public.cnae
 
 CREATE UNLOGGED TABLE IF NOT EXISTS public.empresa
 (
-    cnpj_basico character varying(14) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_basico character varying(8) COLLATE pg_catalog."default" NOT NULL,
     razao_social character varying(200) COLLATE pg_catalog."default",
     cod_natureza_juridica character varying(4) COLLATE pg_catalog."default" NOT NULL,
-    cod_qualificacao_responsavel character varying(4) COLLATE pg_catalog."default" NOT NULL,
+    cod_qualificacao_responsavel character varying(2) COLLATE pg_catalog."default" NOT NULL,
     capital_social numeric(16, 2) NOT NULL,
     cod_porte character varying(2) COLLATE pg_catalog."default",
-    ente_federativo_responsavel character varying(100) COLLATE pg_catalog."default"
+    ente_federativo_responsavel character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT empresa_pkey PRIMARY KEY (cnpj_basico)
 );
 
 CREATE UNLOGGED TABLE IF NOT EXISTS public.estabelecimento
 (
-    cnpj_basico character varying(14) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_basico character varying(8) COLLATE pg_catalog."default" NOT NULL,
     cnpj_ordem character varying(4) COLLATE pg_catalog."default" NOT NULL,
     cnpj_dv character varying(2) COLLATE pg_catalog."default" NOT NULL,
     matriz_filial character varying(1) COLLATE pg_catalog."default" NOT NULL,
@@ -35,7 +36,7 @@ CREATE UNLOGGED TABLE IF NOT EXISTS public.estabelecimento
     cod_pais character varying(3) COLLATE pg_catalog."default",
     data_inicio_atividade date NOT NULL,
     cod_cnae_principal character varying(7) COLLATE pg_catalog."default" NOT NULL,
-    cod_cnae_secundario character varying COLLATE pg_catalog."default",
+    cod_cnae_secundario text COLLATE pg_catalog."default",
     tipo_logradouro character varying(20) COLLATE pg_catalog."default",
     logradouro character varying(60) COLLATE pg_catalog."default",
     numero character varying(6) COLLATE pg_catalog."default",
@@ -50,9 +51,18 @@ CREATE UNLOGGED TABLE IF NOT EXISTS public.estabelecimento
     telefone_2 character varying(10) COLLATE pg_catalog."default",
     ddd_fax character varying(4) COLLATE pg_catalog."default",
     fax character varying(10) COLLATE pg_catalog."default",
-    email character varying COLLATE pg_catalog."default",
+    email text COLLATE pg_catalog."default",
     situacao_especial character varying(100) COLLATE pg_catalog."default",
-    data_situacao_especial date
+    data_situacao_especial date,
+    CONSTRAINT estabelecimento_pkey PRIMARY KEY (cnpj_basico, cnpj_ordem, cnpj_dv)
+);
+
+CREATE UNLOGGED TABLE IF NOT EXISTS public.estabelecimento_cnae_sec
+(
+    cnpj_basico character varying(8) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_ordem character varying(4) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_dv character varying(2) COLLATE pg_catalog."default" NOT NULL,
+    cod_cnae character varying(7) COLLATE pg_catalog."default" NOT NULL
 );
 
 CREATE UNLOGGED TABLE IF NOT EXISTS public.motivo
@@ -92,7 +102,7 @@ CREATE UNLOGGED TABLE IF NOT EXISTS public.qualificacao_socio
 
 CREATE UNLOGGED TABLE IF NOT EXISTS public.simples
 (
-    cnpj_basico character varying(14) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_basico character varying(8) COLLATE pg_catalog."default",
     opcao_simples character varying(1) COLLATE pg_catalog."default",
     data_opcao_simples date,
     data_exclusao_simples date,
@@ -103,7 +113,7 @@ CREATE UNLOGGED TABLE IF NOT EXISTS public.simples
 
 CREATE UNLOGGED TABLE IF NOT EXISTS public.socio
 (
-    cnpj_basico character varying(14) COLLATE pg_catalog."default" NOT NULL,
+    cnpj_basico character varying(8) COLLATE pg_catalog."default" NOT NULL,
     identificador_socio character varying(1) COLLATE pg_catalog."default" NOT NULL,
     nome_socio character varying(200) COLLATE pg_catalog."default",
     cnpj_cpf_socio character varying(14) COLLATE pg_catalog."default",
@@ -130,8 +140,6 @@ ALTER TABLE IF EXISTS public.empresa
     REFERENCES public.qualificacao_socio (cod_qualificacao) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
-CREATE INDEX IF NOT EXISTS idx_empresa_qualificacao
-    ON public.empresa(cod_qualificacao_responsavel);
 
 
 ALTER TABLE IF EXISTS public.estabelecimento
@@ -175,6 +183,22 @@ ALTER TABLE IF EXISTS public.estabelecimento
     ON DELETE NO ACTION;
 
 
+ALTER TABLE IF EXISTS public.estabelecimento_cnae_sec
+    ADD CONSTRAINT fk_estabelecimento_cnae_sec_1 FOREIGN KEY (cnpj_basico, cnpj_ordem, cnpj_dv)
+    REFERENCES public.estabelecimento (cnpj_basico, cnpj_ordem, cnpj_dv) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+CREATE INDEX IF NOT EXISTS idx_cnae_sec_estab
+    ON public.estabelecimento_cnae_sec(cnpj_basico, cnpj_ordem, cnpj_dv);
+
+
+ALTER TABLE IF EXISTS public.estabelecimento_cnae_sec
+    ADD CONSTRAINT fk_estabelecimento_cnae_sec_2 FOREIGN KEY (cod_cnae)
+    REFERENCES public.cnae (cod_cnae) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
 ALTER TABLE IF EXISTS public.simples
     ADD CONSTRAINT fk_simples_1 FOREIGN KEY (cnpj_basico)
     REFERENCES public.empresa (cnpj_basico) MATCH SIMPLE
@@ -205,8 +229,6 @@ ALTER TABLE IF EXISTS public.socio
     REFERENCES public.qualificacao_socio (cod_qualificacao) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
-CREATE INDEX IF NOT EXISTS idx_socio_qualificacao
-    ON public.socio(cod_qualificacao_socio);
 
 
 ALTER TABLE IF EXISTS public.socio

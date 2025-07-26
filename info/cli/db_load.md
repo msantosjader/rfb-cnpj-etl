@@ -1,8 +1,8 @@
-
 # Comando `db load`
 
 Realiza apenas a carga a partir de arquivos `.zip` já baixados.
 ---
+
 ### Comportamento Padrão
 
 - **Mês**: último mês disponível
@@ -11,17 +11,17 @@ Realiza apenas a carga a partir de arquivos `.zip` já baixados.
 
 ### Flags (opcionais)
 
-| Flag              | Tipo                 | Padrão                     | Descrição                                                                |
-|-------------------|----------------------|-----------------------------|--------------------------------------------------------------------------|
-| `--engine`        | `sqlite` / `postgres`| `sqlite`                   | Tipo do SGBD.                                                            |
-| `--month`         | `<MM/AAAA>`          | _último mês disponível_     | Mês a ser carregado.                                                     |
-| `--download-dir`  | `<path>`             | `data/downloads/YYYY-MM`   | Pasta onde os arquivos `.zip` estão.                                     |
-| `--db-path`         | `<path>`              | `data/db/dados_cnpj.db` | Caminho do arquivo do banco de dados (usado no SQLite).                   |
-| `--db-name`         | `<string>`            | `dados_cnpj`            | Nome do banco de dados (usado no Postgres).                               |
-| `--skip-index`      | _flag_                | _desativado_            | Se usado, não cria índices ao final da carga de dados.                   |
-| `--skip-validation` | _flag_                | _desativado_            | Se usado, ignora a verificação dos arquivos (local x site da RFB)        |
-| `--low-memory`      | _flag_                | _desativado_            | Se usado, realiza garbage collects no decorrer da execução               |
-| `--parallel`        | _flag_                | _desativado_            | Se usado, utiliza multi thread para a carga de dados (usado no Postgres) |
+| Flag                | Tipo                  | Padrão                   | Descrição                                                                |
+|---------------------|-----------------------|--------------------------|--------------------------------------------------------------------------|
+| `--engine`          | `sqlite` / `postgres` | `sqlite`                 | Tipo do SGBD.                                                            |
+| `--month`           | `<MM/AAAA>`           | _último mês disponível_  | Mês a ser carregado.                                                     |
+| `--download-dir`    | `<path>`              | `data/downloads/YYYY-MM` | Pasta onde os arquivos `.zip` estão.                                     |
+| `--db-path`         | `<path>`              | `data/db/dados_cnpj.db`  | Caminho do arquivo do banco de dados (usado no SQLite).                  |
+| `--db-name`         | `<string>`            | `dados_cnpj`             | Nome do banco de dados (usado no Postgres).                              |
+| `--skip-index`      | _flag_                | _desativado_             | Se usado, não cria índices ao final da carga de dados.                   |
+| `--skip-validation` | _flag_                | _desativado_             | Se usado, ignora a verificação dos arquivos (local x site da RFB)        |
+| `--low-memory`      | _flag_                | _desativado_             | Se usado, realiza garbage collects no decorrer da execução               |
+| `--parallel`        | _flag_                | _desativado_             | Se usado, utiliza multi thread para a carga de dados (usado no Postgres) |
 
 ## Exemplo
 
