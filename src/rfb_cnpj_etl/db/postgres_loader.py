@@ -9,7 +9,7 @@ from ..config import QUEUE_SIZE, WORKER_THREADS, DEBUG_LOG
 from ..utils.logger import print_log
 from ..utils.progress import pbar, update_progress
 from ..utils.db_batch_producer import produce_batches
-from ..utils.db_transformers import transform_batch, convert_rows_to_csv_buffer
+from ..utils.db_transformers import convert_rows_to_csv_buffer
 
 
 def consume_batches(insertion_queue, postgres_config: dict, thread_id: int,
@@ -29,7 +29,8 @@ def consume_batches(insertion_queue, postgres_config: dict, thread_id: int,
                 insertion_queue.task_done()
                 break
 
-            rows = transform_batch(item)
+            rows = item["rows"]
+
             if not rows:
                 insertion_queue.task_done()
                 continue
@@ -128,5 +129,8 @@ def run_postgres_loader(files_dir: str, postgres_config: dict, total_records: in
 
         for t in workers:
             t.join()
+
+        if "bar" in shared_progress:
+            shared_progress["bar"].close()
 
         print_log("CARGA DE DADOS CONCLUÍDA", level="success")

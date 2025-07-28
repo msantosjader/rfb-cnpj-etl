@@ -74,12 +74,18 @@ class SQLiteBuilder:
         try:
             print_log("CRIANDO TABELAS...", level="task")
             cur = self.conn.cursor()
+
+            # Tabelas grandes cuja PK será criada apenas no final
+            tables_to_defer_pk = {'empresa', 'estabelecimento'}
+
             for table_name, spec in self.schema.items():
                 cur.execute(f'DROP TABLE IF EXISTS "{table_name}"')
                 columns_defs = [f'"{col[0]}" {col[1]}' for col in spec['columns']]
                 if 'primary_key' in spec:
-                    pk_cols = ', '.join([f'"{col}"' for col in spec['primary_key']])
-                    columns_defs.append(f'PRIMARY KEY ({pk_cols})')
+                    # Só cria a PK agora se a tabela NÃO estiver na lista de adiamento
+                    if table_name not in tables_to_defer_pk:
+                        pk_cols = ', '.join([f'"{col}"' for col in spec['primary_key']])
+                        columns_defs.append(f'PRIMARY KEY ({pk_cols})')
                 if 'foreign_keys' in spec:
                     for fk in spec['foreign_keys']:
                         fk_cols = ', '.join([f'"{col}"' for col in fk['columns']])

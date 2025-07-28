@@ -44,26 +44,49 @@ def update_progress(rows_inserted: int,
         lock: Lock para sincronização (opcional)
         bar: Instância da barra de progresso (opcional)
     """
+    # --- Se não estiver em modo debug, atualiza a barra e termina ---
+    if not debug and bar:
+        bar.update(rows_inserted)
+        return
+
+    # Calcula o total de registros inseridos até o momento
     if shared is not None and lock is not None:
         with lock:
             shared["inserted_total"] += rows_inserted
-            shared["queue_size"] = insertion_queue.qsize()
-            inserted = shared["inserted_total"]
+            current_inserted = shared["inserted_total"]
     elif accumulated_total is not None:
-        inserted = accumulated_total
+        current_inserted = accumulated_total
     else:
-        inserted = rows_inserted
+        return  # Não faz nada se não tiver como calcular o total
 
-    percent = min(100.0, (inserted / total) * 100) if total else 0
-    queue_size = insertion_queue.qsize()
-    fname = basename(filename).upper()
+    # Calcula o percentual atual
+    current_percent = min(100.0, (current_inserted / total) * 100) if total > 0 else 0
 
-    if not debug and bar:
-        bar.update(rows_inserted)
+    # Determina o último percentual reportado para o LOG
+    if shared is not None and lock is not None:
+        # Modo multi-thread: pega do dicionário compartilhado
+        last_log_percent = shared.get("last_log_percent", 0.0)
     else:
+        # Modo single-thread: pega de um atributo da própria função
+        if not hasattr(update_progress, 'last_log_percent'):
+            update_progress.last_log_percent = 0.0
+        last_log_percent = update_progress.last_log_percent
+
+    # --- LÓGICA DE CONTROLE: SÓ IMPRIME O LOG SE AVANÇAR PELO MENOS 1% ---
+    if (current_percent - last_log_percent) >= 0.5 or (current_percent == 100.0 and last_log_percent <= 100.0):
+        # Atualiza o estado do último percentual reportado
+        if shared is not None and lock is not None:
+            with lock:
+                shared["last_log_percent"] = current_percent
+        else:
+            update_progress.last_log_percent = current_percent
+
+        # Imprime o log
+        queue_size = insertion_queue.qsize()
+        fname = basename(filename).upper()
         print_log(
-            f"REGISTROS: {inserted:>12,.0f}".replace(",", ".") +
-            f" ({percent:6.2f}%)"
+            f"REGISTROS: {current_inserted:>12,.0f}".replace(",", ".") +
+            f" ({current_percent:6.2f}%)"
             f" | {fname:<23}" +
             f" | FILA: {queue_size:>2} / {queue_size_max:<2}",
             level="debug"

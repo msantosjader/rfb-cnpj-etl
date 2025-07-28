@@ -7,23 +7,32 @@ Transformadores de dados.
 import csv
 from io import BytesIO, StringIO
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable, Any
 
 
-def sanitize_strings(rows: list) -> list:
-    """
-    Sanitiza todas as strings em uma lista de linhas, removendo o byte nulo
-    e outros caracteres inválidos para a codificação 'windows-1252'.
-    """
+def sanitize_for_sqlite(rows: List[List[Any]]) -> List[List[Any]]:
+    """Remove o byte nulo e apara espaços em branco."""
+    cleaned_rows = []
+    for row in rows:
+        new_row = [
+            val.replace('\x00', '').strip() if isinstance(val, str) else val
+            for val in row
+        ]
+        cleaned_rows.append(new_row)
+    return cleaned_rows
+
+
+def sanitize_for_postgres(rows: List[List[Any]]) -> List[List[Any]]:
+    """Sanitiza para bancos de dados com encoding 'windows-1252'."""
     cleaned_rows = []
     for row in rows:
         new_row = []
         for val in row:
             if isinstance(val, str):
-                sanitized_val = val.replace('\x00', '').strip()
-                new_row.append(sanitized_val.encode("windows-1252", errors="ignore").decode("windows-1252"))
-            else:
-                new_row.append(val)
+                s = val.replace('\x00', '').strip()
+                # Remove caracteres incompatíveis com windows-1252
+                val = s.encode("windows-1252", "ignore").decode("windows-1252")
+            new_row.append(val)
         cleaned_rows.append(new_row)
     return cleaned_rows
 
@@ -87,7 +96,7 @@ def convert_rows_to_csv_buffer(rows: List[List[Union[str, int, float, None]]]) -
     return byte_buffer
 
 
-def transform_batch(item: dict) -> List:
+def transform_batch(item: dict, sanitizer_func: Callable) -> List:
     """
     Aplica todas as transformações necessárias a um lote de dados.
     """
@@ -95,11 +104,8 @@ def transform_batch(item: dict) -> List:
     columns = item["columns"]
     rows = item["rows"]
 
-    # ETAPA 1: Sanitização. Acontece sempre, para todos os dados.
-    # Garante que não há caracteres inválidos para as próximas etapas.
-    rows = sanitize_strings(rows)
+    rows = sanitizer_func(rows)
 
-    # ETAPA 2: Transformações específicas da tabela.
     if table == "empresa":
         rows = normalize_numeric_br(rows, columns, ["capital_social"])
 

@@ -7,11 +7,12 @@ import zipfile
 import csv
 import time
 from io import TextIOWrapper
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Callable
 from threading import Thread
 from .logger import print_log
 from ..db.schema import SCHEMA
 from ..config import BATCH_SIZE, BATCH_RATIO
+from ..utils.db_transformers import transform_batch, sanitize_for_sqlite, sanitize_for_postgres
 
 
 def get_targets_from_zip_name(zip_name: str) -> List[Dict]:
@@ -27,7 +28,8 @@ def get_targets_from_zip_name(zip_name: str) -> List[Dict]:
     return targets
 
 
-def _process_zip_file(zip_file: Path, insertion_queue: Queue, low_memory: bool = False):
+def _process_zip_file(zip_file: Path, insertion_queue: Queue,
+                      sanitizer_func: Callable, low_memory: bool = False, ):
     try:
         targets = get_targets_from_zip_name(zip_file.name)
         if not targets:
@@ -75,24 +77,35 @@ def _process_zip_file(zip_file: Path, insertion_queue: Queue, low_memory: bool =
                                 ratio = BATCH_RATIO.get(table_name, 1.0)
                                 batch_size = int(BATCH_SIZE * ratio)
                                 if len(batch_list) >= batch_size:
-                                    while insertion_queue.full(): time.sleep(0.05)
-                                    insertion_queue.put({
+                                    item = {
                                         "table": table_name,
                                         "columns": columns_map[table_name],
                                         "rows": batch_list,
                                         "filename": str(zip_file)
-                                    })
+                                    }
+                                    transformed_rows = transform_batch(item, sanitizer_func)
+                                    item["rows"] = transformed_rows
+
+                                    if transformed_rows:
+                                        while insertion_queue.full(): time.sleep(0.05)
+                                        insertion_queue.put(item)
+
                                     batches[table_name] = []
 
                         for table_name, batch_list in batches.items():
                             if batch_list:
-                                insertion_queue.put({
+                                item = {
                                     "table": table_name,
                                     "columns": columns_map[table_name],
                                     "rows": batch_list,
                                     "filename": str(zip_file)
-                                })
+                                }
+                                # CHAMADA CORRIGIDA para usar a variável 'sanitizer'
+                                transformed_rows = transform_batch(item, sanitizer_func)
+                                item["rows"] = transformed_rows
 
+                                if transformed_rows:
+                                    insertion_queue.put(item)
                 except Exception as e:
                     print_log(f"Erro ao ler {file_info.filename} em {zip_file.name}: {e}", level="error")
 
@@ -105,13 +118,21 @@ def _process_zip_file(zip_file: Path, insertion_queue: Queue, low_memory: bool =
 
 
 def produce_batches(files_dir: str, insertion_queue: Queue, engine: str, num_workers: Optional[int] = None,
-                    parallel: bool = False, low_memory: bool = False):
+                    parallel: bool = False, low_memory: bool = False,
+                    ):
     zip_files = sorted(Path(files_dir).glob("*.zip"))
+
+    if engine == "sqlite":
+        sanitizer = sanitize_for_sqlite
+    elif engine == "postgres":
+        sanitizer = sanitize_for_postgres
+    else:
+        raise ValueError(f"Engine '{engine}' não é suportado.")
 
     if parallel and engine == "postgres":
         threads = []
         for zip_file in zip_files:
-            t = Thread(target=_process_zip_file, args=(zip_file, insertion_queue, low_memory))
+            t = Thread(target=_process_zip_file, args=(zip_file, insertion_queue, sanitizer, low_memory))
             t.start()
             threads.append(t)
 
@@ -119,7 +140,7 @@ def produce_batches(files_dir: str, insertion_queue: Queue, engine: str, num_wor
             t.join()
     else:
         for zip_file in zip_files:
-            _process_zip_file(zip_file, insertion_queue, low_memory)
+            _process_zip_file(zip_file, insertion_queue, sanitizer, low_memory)
 
     if engine == "sqlite":
         insertion_queue.put(None)
