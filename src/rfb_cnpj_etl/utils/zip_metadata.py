@@ -92,7 +92,7 @@ def estimate_total_lines_from_size(directory_path: str) -> int:
     rounded_estimated_lines = arredondar_para(estimated_lines, fator=10000)
 
     print_log(
-        f"Estimativa de linhas: {total_size_bytes / (1024 ** 3):.2f} GB de arquivos / {AVG_COMPRESSED_LINE_SIZE_BYTES} bytes/linha = ~{int(rounded_estimated_lines):,} de registros".replace(
+        f"Estimativa de linhas: {total_size_bytes / (1024 ** 3):.2f} GB de arquivos / {AVG_COMPRESSED_LINE_SIZE_BYTES} bytes/linha ~= {int(rounded_estimated_lines):,} de registros".replace(
             ",", "."), level="docs")
     return int(rounded_estimated_lines)
 

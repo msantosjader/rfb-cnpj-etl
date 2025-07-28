@@ -13,7 +13,6 @@ from typing import Optional
 from ..utils.logger import print_log
 from ..utils.progress import pbar, update_progress
 from ..utils.db_batch_producer import produce_batches
-from ..utils.db_transformers import transform_batch
 
 
 def consume_batches(insertion_queue, db_path: str, total_records: int, low_memory: bool):
@@ -30,6 +29,9 @@ def consume_batches(insertion_queue, db_path: str, total_records: int, low_memor
     cursor.execute("PRAGMA journal_mode=MEMORY;")
     cursor.execute("PRAGMA synchronous=OFF;")
     cursor.execute("PRAGMA foreign_keys=OFF;")
+    cursor.execute("PRAGMA locking_mode=EXCLUSIVE;")
+    cursor.execute("PRAGMA temp_store=MEMORY;")
+    cursor.execute("PRAGMA cache_size=-128000;")
 
     inserted_total = 0
 
@@ -42,7 +44,7 @@ def consume_batches(insertion_queue, db_path: str, total_records: int, low_memor
                 insertion_queue.task_done()
                 break
 
-            rows = transform_batch(item)
+            rows = item["rows"]
 
             if not rows:
                 insertion_queue.task_done()

@@ -28,9 +28,9 @@ DEFAULT_ENGINE = "sqlite"  # engine padrão de banco de dados (por enquanto apen
 DEFAULT_PARALLEL = True  # paralelismo de inserção no banco de dados
 DEFAULT_LOW_MEMORY = False  # habilita o uso de memória limitada para inserção no banco
 
-BATCH_SIZE = 200_000  # 50_000  # número de registros por batch ao inserir no banco
+BATCH_SIZE = 250_000  # número de registros por batch ao inserir no banco (menor para o sqlite ~50_000)
 BATCH_RATIO = {  # proporção para utilizar em tabelas específicas
-    "estabelecimento": 0.4  # Ex.: 250_000 * 0.5 = 125_000 para a tabela estabelecimento
+    "estabelecimento": 0.4  # Ex.: 50_000 * 0.4 = 20_000 para a tabela estabelecimento
 }
 WORKER_THREADS = max(1, multiprocessing.cpu_count() - 1)  # quantidade de threads de worker para pipeline de inserção
 QUEUE_SIZE = max(2, WORKER_THREADS * 2) - 5  # tamanho da fila (back‑pressure) no pipeline inserção

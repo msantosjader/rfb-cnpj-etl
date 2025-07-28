@@ -140,43 +140,48 @@ class PostgresBuilder:
         try:
             print_log("CRIANDO CHAVES ESTRANGEIRAS...", level="task")
             if self.conn is None: self.conn = self._connect()
-            self.conn.autocommit = False
+            self.conn.autocommit = True
             cur = self.conn.cursor()
 
+            # 1. Coleta todas as definições de FKs para obter um total
+            all_fks = []
             for table_name, definition in SCHEMA.items():
                 if 'foreign_keys' in definition:
-                    for i, fk in enumerate(definition['foreign_keys'], start=1):
-                        constraint_name = f"fk_{table_name}_{i}"
-                        fk_columns = ', '.join(f'"{col}"' for col in fk['columns'])
+                    for i, fk_def in enumerate(definition['foreign_keys'], start=1):
+                        all_fks.append((table_name, fk_def, i))
 
-                        # Extrai o nome da tabela referenciada e as colunas
-                        ref_table_and_cols = fk['references']
-                        ref_table = ref_table_and_cols.split('(')[0]
-                        ref_cols_str = ref_table_and_cols.split('(')[1].replace(')', '')
-                        ref_cols = ', '.join(f'"{c.strip()}"' for c in ref_cols_str.split(','))
+            # 2. Itera sobre a lista de FKs com um contador global
+            total = len(all_fks)
+            width = len(str(total))
+            for i, (table_name, fk, fk_index) in enumerate(all_fks, start=1):
+                constraint_name = f"fk_{table_name}_{fk_index}"
+                try:
+                    fk_columns = ', '.join(f'"{col}"' for col in fk['columns'])
+                    ref_table_and_cols = fk['references']
+                    ref_table = ref_table_and_cols.split('(')[0].strip()
+                    ref_cols_str = ref_table_and_cols.split('(')[1].replace(')', '')
+                    ref_cols = ', '.join(f'"{c.strip()}"' for c in ref_cols_str.split(','))
 
-                        fk_sql = f'FOREIGN KEY ({fk_columns}) REFERENCES public."{ref_table}"({ref_cols})'
+                    fk_sql = (f'ALTER TABLE public."{table_name}" '
+                              f'ADD CONSTRAINT "{constraint_name}" '
+                              f'FOREIGN KEY ({fk_columns}) '
+                              f'REFERENCES public."{ref_table}"({ref_cols});')
 
-                        try:
-                            cur.execute(
-                                f'ALTER TABLE public."{table_name}" ADD CONSTRAINT "{constraint_name}" {fk_sql};')
-                        except psycopg2.Error as e:
-                            if e.pgcode == '42710':  # 42710 = duplicate_object (nome da constraint)
-                                print_log(f"Constraint {constraint_name} já existe, pulando.", level="docs")
-                                self.conn.rollback()
-                            else:
-                                print_log(f"ERRO AO ADICIONAR FK '{constraint_name}' em '{table_name}': {e}",
-                                          level="error")
-                                self.conn.rollback()  # Garante rollback em outros erros
-                                raise e
+                    cur.execute(fk_sql)
+                    print_log(f"[{i:0{width}}/{total}] FK CRIADA: {constraint_name} em '{table_name}'", level="docs")
 
-            self.conn.commit()
+                except psycopg2.Error as e:
+                    # 42710 = duplicate_object (constraint já existe)
+                    if e.pgcode == '42710':
+                        print_log(f"[{i:0{width}}/{total}] FK JÁ EXISTE: {constraint_name}, pulando.", level="docs")
+                    else:
+                        print_log(f"[{i:0{width}}/{total}] ERRO AO ADICIONAR FK '{constraint_name}': {e}",
+                                  level="error")
+
             print_log("CHAVES ESTRANGEIRAS CRIADAS", level="success")
         except psycopg2.Error as e:
             print_log(f"ERRO AO CRIAR FKs: {e}", level="error")
             raise
-        finally:
-            if self.conn: self.conn.autocommit = True
 
     def create_indexes(self):
         """Cria os índices definidos no SCHEMA."""
