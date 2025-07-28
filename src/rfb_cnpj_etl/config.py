@@ -42,7 +42,7 @@ POSTGRES = {
     "host": "localhost",
     "port": 5432,
     "user": "postgres",
-    "password": "147258",  # sua_senha_aqui
+    "password": "sua_senha_aqui",
     "database": "dados_cnpj"
 }
 
