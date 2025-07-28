@@ -183,6 +183,15 @@ O modelo relacional do banco de dados pode ser visualizado nos arquivos abaixo:
 
 ---
 
+## Exemplos de Consultas
+
+Para começar a explorar os dados, consulte os arquivos de exemplo abaixo. Eles contêm exemplos práticos de como utilizar as tabelas e colunas para extrair informações úteis, como buscar uma empresa por CNPJ, listar seus sócios ou filtrar estabelecimentos por cidade.
+
+- Exemplos para PostgreSQL: [query_postgres.md](docs/exemplos/query_postgres.md)
+- Exemplos para SQLite: [query_sqlite.md](docs/exemplos/query_sqlite.md)
+  
+---
+
 ## Estrutura do Projeto
 
 ```bash
