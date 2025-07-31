@@ -158,12 +158,12 @@ Edite conforme a sua necessidade.
 
 | Processo                     | Tempo                   |
 |------------------------------|-------------------------|
-| Download dos arquivos        | 00:50:00 ~ 01:00:00     |
-| Preparação do banco de dados | 00:05:00                |
-| Carga de dados completa      | 01:00:00 ~ 01:30:00     |
-| Pós-processamento            | 00:10:00 ~ 00:15:00     |
-| Criação dos índices          | 00:45:00 ~ 01:00:00     |
-| **Total**                    | **03:00:00 ~ 04:00:00** |
+| Download dos arquivos        | ~ 01:00:00              |
+| Preparação do banco de dados | ~ 00:05:00              |
+| Carga de dados completa      | 01:30:00 ~ 02:30:00     |
+| Pós-processamento            | ~ 00:15:00              |
+| Criação dos índices          | ~ 01:00:00              |
+| **Total**                    | **04:00:00 ~ 05:00:00** |
 
 * Utilizando a base de dados de junho de 2025.
 
