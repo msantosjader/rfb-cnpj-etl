@@ -61,7 +61,6 @@ FROM estabelecimento est
 JOIN empresa e ON est.cnpj_basico = e.cnpj_basico
 LEFT JOIN simples sn ON e.cnpj_basico = sn.cnpj_basico
 LEFT JOIN municipio mun ON est.cod_municipio = mun.cod_municipio
-LEFT JOIN pais p ON est.cod_pais = p.cod_pais
 LEFT JOIN motivo mot ON est.cod_motivo_situacao_cadastral = mot.cod_motivo
 LEFT JOIN natureza_juridica nat ON e.cod_natureza_juridica = nat.cod_natureza
 LEFT JOIN cnae cn ON est.cod_cnae_principal = cn.cod_cnae
