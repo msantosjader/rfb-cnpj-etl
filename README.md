@@ -17,8 +17,6 @@ mensalmente pela Receita Federal, permitindo que desenvolvedores, analistas e pe
 em bases relacionais para fins analíticos, acadêmicos ou de integração com outros sistemas.
 O total de linhas (somando todas as tabelas) já supera os 196 milhões.
 
-Atualmente, estão sendo realizados testes de performance em consultas mais complexas.
-
 > Para manter os dados sempre atualizados, o processo de download e carga de dados deve ser executado novamente a cada
 > nova publicação mensal.
 
