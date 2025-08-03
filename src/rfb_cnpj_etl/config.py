@@ -22,11 +22,11 @@ CNPJ_DATA_URL = "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos
 # ---------------------------------------------------------------------------
 # BANCO DE DADOS
 # ---------------------------------------------------------------------------
-AVG_COMPRESSED_LINE_SIZE_BYTES = 35
 ENGINE_OPTIONS = ["sqlite", "postgres"]  # opções de engines de banco de dados (já implementadas)
 DEFAULT_ENGINE = "sqlite"  # engine padrão de banco de dados (por enquanto apenas SQLite)
 DEFAULT_PARALLEL = True  # paralelismo de inserção no banco de dados
 DEFAULT_LOW_MEMORY = False  # habilita o uso de memória limitada para inserção no banco
+AVG_COMPRESSED_LINE_SIZE_BYTES = 35  # 35 bytes/linha para estimar o total de linhas e calcular o progresso da carga de dados
 
 BATCH_SIZE = 250_000  # número de registros por batch ao inserir no banco (menor para o sqlite ~50_000)
 BATCH_RATIO = {  # proporção para utilizar em tabelas específicas
@@ -36,7 +36,7 @@ WORKER_THREADS = max(1, multiprocessing.cpu_count() - 1)  # quantidade de thread
 QUEUE_SIZE = max(2, WORKER_THREADS * 2) - 5  # tamanho da fila (back‑pressure) no pipeline inserção
 
 # ---------------------------------------------------------------------------
-# POSTGRESQL
+# CONEXÃO POSTGRESQL
 # ---------------------------------------------------------------------------
 POSTGRES = {
     "host": "localhost",
@@ -68,5 +68,4 @@ BROWSER_AGENTS = [  # lista de user‑agents rotativos para as requisições HTT
 # PRINT_LOG
 # ---------------------------------------------------------------------------
 # True: 🕒 23:18:32 |⏱️ 0:06:37 |🐞  2.507.405 (  1.27%) | ESTABELECIMENTOS8.ZIP   | FILA: 22 / 22
-# False: utiliza uma barra de progresso com tqdm
-DEBUG_LOG = True
+DEBUG_LOG = False  # False: utiliza uma barra de progresso com tqdm
