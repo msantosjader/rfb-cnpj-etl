@@ -17,7 +17,8 @@ mensalmente pela Receita Federal, permitindo que desenvolvedores, analistas e pe
 em bases relacionais para fins analíticos, acadêmicos ou de integração com outros sistemas.
 O total de linhas (somando todas as tabelas) já está na casa dos 200 milhões.
 
-É um trabalho prático de estudos em Python e Dados, acelerado com o apoio de ferramentas de IA (LLMs). Como um desenvolvedor iniciante, feedbacks, sugestões e críticas construtivas são especialmente bem-vindos para meu aprendizado.
+É um trabalho prático de estudos em Python e Dados, acelerado com o apoio de ferramentas de IA (LLMs). Como um
+desenvolvedor iniciante, feedbacks, sugestões e críticas construtivas são especialmente bem-vindos para meu aprendizado.
 
 > Para manter os dados sempre atualizados, o processo de download e carga de dados deve ser executado novamente a cada
 > nova publicação mensal.
@@ -49,6 +50,15 @@ pip install -r requirements.txt
 
 > Para o `PostgreSQL`, é necessário ter o servidor instalado e configurado. Para o **SQLite**, nenhuma instalação
 > adicional é necessária.
+
+### Instalação Simplificada (Usuários Windows)
+
+Se você está em um ambiente **Windows** e prefere **não usar o terminal ou Git**, há uma alternativa mais simples:
+
+- Veja a seção [Scripts de Automação](#-scripts-de-automação) para preparar e executar tudo com apenas alguns cliques
+  usando arquivos `.bat`.
+
+---
 
 ### Espaço necessário
 
@@ -187,11 +197,13 @@ O modelo relacional do banco de dados pode ser visualizado nos arquivos abaixo:
 
 ## Exemplos de Consultas
 
-Para começar a explorar os dados, consulte os arquivos de exemplo abaixo. Eles contêm exemplos práticos de como utilizar as tabelas e colunas para extrair informações úteis, como buscar uma empresa por CNPJ, listar seus sócios ou filtrar estabelecimentos por cidade.
+Para começar a explorar os dados, consulte os arquivos de exemplo abaixo. Eles contêm exemplos práticos de como utilizar
+as tabelas e colunas para extrair informações úteis, como buscar uma empresa por CNPJ, listar seus sócios ou filtrar
+estabelecimentos por cidade.
 
 - Exemplos para PostgreSQL: [query_postgres.md](docs/exemplos/query_postgres.md)
 - Exemplos para SQLite: [query_sqlite.md](docs/exemplos/query_sqlite.md)
-  
+
 ---
 
 ## Estrutura do Projeto
@@ -236,6 +248,11 @@ rfb-cnpj-etl/
 │   │   ├── db_load.md                  # Documentação do comando 'db load'
 │   │   └── download.md                 # Documentação do comando 'download'
 │   └── normalizacao.md                 # Ajustes realizados nos dados carregados
+├── scripts/                            # Automação dos processos (Windows)      
+│   ├── 001_preparar_ambiente.bat       # Cria o ambiente virtual e instala as dependências
+│   ├── 002.0_instalar_python.bat       # Executar ambos download e carga de dados
+│   ├── 002.1_run_download.bat          # Executar apenas o download
+│   └── 002.2_run_load.bat              # Executar apenas a carga de dados
 ├── .gitignore
 ├── LICENSE
 ├── README.md
@@ -253,7 +270,9 @@ rfb-cnpj-etl/
 
 ## Como Contribuir
 
-Contribuições são bem-vindas. Para reportar bugs ou sugerir ideias, por favor, abra uma [Issue](https://github.com/msantosjader/rfb-cnpj-etl/issues). Para enviar melhorias no código ou na documentação, crie um [Pull Request](https://github.com/msantosjader/rfb-cnpj-etl/pulls).
+Contribuições são bem-vindas. Para reportar bugs ou sugerir ideias, por favor, abra
+uma [Issue](https://github.com/msantosjader/rfb-cnpj-etl/issues). Para enviar melhorias no código ou na documentação,
+crie um [Pull Request](https://github.com/msantosjader/rfb-cnpj-etl/pulls).
 
 ---
 
