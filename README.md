@@ -35,11 +35,13 @@ O total de linhas (somando todas as tabelas) já está na casa dos 200 milhões.
 
 ## Instalação
 
-Clone o projeto e instale os requisitos com:
+Clone o projeto, crie o ambiente virtual e instale os requisitos com:
 
 ```bash
 git clone https://github.com/msantosjader/rfb-cnpj-etl.git
 cd rfb-cnpj-etl
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
