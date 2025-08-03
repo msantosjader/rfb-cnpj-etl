@@ -11,7 +11,7 @@ Este método é ideal se você quer **apenas usar a ferramenta**, sem precisar d
 
 ### 📥 Baixe o Projeto
 
-Faça o download da versão mais recente em formato `.zip` a partir da página de **Releases**:
+Faça o download da versão mais recente em formato `.zip` a partir da página de **Releases**:  
 ➡️ **[Baixar a Última Versão](https://github.com/msantosjader/rfb-cnpj-etl/releases/latest)**
 
 > Na página, encontre a seção **“Assets”** e clique em **`Source code (zip)`** para baixar.
