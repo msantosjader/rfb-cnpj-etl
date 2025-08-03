@@ -187,7 +187,7 @@ SCHEMA = {
             {'columns': ['cod_cnae'], 'references': 'cnae(cod_cnae)'}
         ],
         'indexes': [
-            {'name': 'idx_cnae_sec_estab', 'columns': ['cnpj_basico', 'cnpj_ordem', 'cnpj_dv']}
+            {'name': 'idx_estab_cnae_sec', 'columns': ['cnpj_basico', 'cnpj_ordem', 'cnpj_dv']}
         ]
     }
 }
