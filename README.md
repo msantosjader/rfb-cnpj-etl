@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.9+-green)](...)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../../rfb-cnpj-etl/LICENSE)
 
-Extração e carregamento dos dados do CNPJ da Receita Federal (ETL)
+ETL completo dos dados públicos de CNPJ para bancos de dados relacionais.
 
 Fonte: [Dados Abertos CNPJ - Receita Federal](https://dados.gov.br/dados/conjuntos-dados/cadastro-nacional-da-pessoa-juridica---cnpj)
 
@@ -16,6 +16,8 @@ Este projeto pretende facilitar o acesso, extração e estruturação dos dados 
 mensalmente pela Receita Federal, permitindo que desenvolvedores, analistas e pesquisadores utilizem essas informações
 em bases relacionais para fins analíticos, acadêmicos ou de integração com outros sistemas.
 O total de linhas (somando todas as tabelas) já está na casa dos 200 milhões.
+
+É um trabalho prático de estudos em Python e Dados, acelerado com o apoio de ferramentas de IA (LLMs). Como um desenvolvedor iniciante, feedbacks, sugestões e críticas construtivas são especialmente bem-vindos para meu aprendizado.
 
 > Para manter os dados sempre atualizados, o processo de download e carga de dados deve ser executado novamente a cada
 > nova publicação mensal.
@@ -244,6 +246,12 @@ rfb-cnpj-etl/
     - Faça as alterações necessárias em `utils/produce_batches.py` (para paralelismo, por exemplo)
     - Acrescente como opção em **ENGINE_OPTIONS** no `config.py`
     - Adicione as variáveis necessárias em `config.py` (como conexão e diretórios)
+
+---
+
+## Como Contribuir
+
+Contribuições são bem-vindas. Para reportar bugs ou sugerir ideias, por favor, abra uma [Issue](https://github.com/msantosjader/rfb-cnpj-etl/issues). Para enviar melhorias no código ou na documentação, crie um [Pull Request](https://github.com/msantosjader/rfb-cnpj-etl/pulls).
 
 ---
 
