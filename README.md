@@ -15,9 +15,7 @@ Fonte: [Dados Abertos CNPJ - Receita Federal](https://dados.gov.br/dados/conjunt
 Este projeto pretende facilitar o acesso, extração e estruturação dos dados públicos do CNPJ, disponibilizados
 mensalmente pela Receita Federal, permitindo que desenvolvedores, analistas e pesquisadores utilizem essas informações
 em bases relacionais para fins analíticos, acadêmicos ou de integração com outros sistemas.
-O total de linhas (somando todas as tabelas) já supera os 196 milhões.
-
-Atualmente, estão sendo realizados testes de performance em consultas mais complexas.
+O total de linhas (somando todas as tabelas) já está na casa dos 200 milhões.
 
 > Para manter os dados sempre atualizados, o processo de download e carga de dados deve ser executado novamente a cada
 > nova publicação mensal.
@@ -160,12 +158,12 @@ Edite conforme a sua necessidade.
 
 | Processo                     | Tempo                   |
 |------------------------------|-------------------------|
-| Download dos arquivos        | 00:50:00 ~ 01:00:00     |
-| Preparação do banco de dados | 00:05:00                |
-| Carga de dados completa      | 01:00:00 ~ 01:30:00     |
-| Pós-processamento            | 00:10:00 ~ 00:15:00     |
-| Criação dos índices          | 00:45:00 ~ 01:00:00     |
-| **Total**                    | **03:00:00 ~ 04:00:00** |
+| Download dos arquivos        | ~ 01:00:00              |
+| Preparação do banco de dados | ~ 00:05:00              |
+| Carga de dados completa      | 01:30:00 ~ 02:30:00     |
+| Pós-processamento            | ~ 00:15:00              |
+| Criação dos índices          | ~ 01:00:00              |
+| **Total**                    | **04:00:00 ~ 05:00:00** |
 
 * Utilizando a base de dados de junho de 2025.
 
