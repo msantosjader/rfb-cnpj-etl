@@ -55,8 +55,7 @@ pip install -r requirements.txt
 
 Se você está em um ambiente **Windows** e prefere **não usar o terminal ou Git**, há uma alternativa mais simples:
 
-- Veja a seção [Scripts de Automação](#-scripts-de-automação) para preparar e executar tudo com apenas alguns cliques
-  usando arquivos `.bat`.
+- Veja em [Scripts](./scripts/) como preparar e executar tudo de forma simples usando arquivos `.bat`.
 
 ---
 
